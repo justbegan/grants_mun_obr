@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container pt-4 pt-md-5">
+        <h1 class="mb-4 d-none d-md-block">
+            <a class="text-decoration-none text-dark" href="{% url 'news' %}">
+                <i class="fas fa-chevron-left fa-sm pr-4"></i>Новости
+            </a>
+        </h1>
+        <h3 class="mb-4 d-block d-md-none">
+            <a class="text-decoration-none text-dark" href="{% url 'news' %}">
+                <i class="fas fa-chevron-left fa-sm pr-4"></i>Новости
+            </a>
+        </h3>
+        <div class="row">
+            <div class="col-md-9">
+                <div><b>{{ object.title }}</b></div>
+                {% if object.img %}
+                    <img class="pt-3" width="100%" src="{{ object.img.url }}"/>
+                {% endif %}
+
+                <p>{{ object.content | safe }}</p>
+                <p class="text-muted">{{ news.created_on }}</p>
+            </div>
+            <div class="col-md-3">
+                <div><b>Другие новости</b></div>
+                <div class="row pt-3">
+                    {% for news in news_list %}
+                        {% with single=True %}
+                            {% include 'news/_item.html' %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

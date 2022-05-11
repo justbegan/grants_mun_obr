@@ -1,0 +1,92 @@
+{% load auth_extras %}
+
+{% for member in project.projectmember_set.all %}
+<table class="table table-hover table-sm">
+<tr>
+    <td width="400px">Должность или роль в заявленном проекте:</td>
+    <td>{{member.position|if_empty:"Не заполнено"}}</td>
+</tr>
+<tr>
+    <td> ФИО члена команды:</td>
+    <td>
+        {% if member.last_name and member.first_name and member.middle_name%} 
+            {{member}}
+        {% else %}
+            Не заполнено
+        {% endif %}
+    </td>
+</tr>
+
+<tr>
+    <td>Образование:</td>
+    <td>{{member.get_education_display|if_empty:"Не заполнено"}}</td>
+</tr>
+
+<tr>
+    <td>Образовательные организации и специальности:</td>
+    <td>
+        {% if not member.educations %} Не заполнено {% endif %}
+    </td>
+</tr>
+{% for institution in member.educations %}
+<tr>
+    <td>Образовательная организация:</td>
+    <td>{{ institution.organization }}</td>
+</tr>
+<tr>
+    <td>Специальность:</td>
+    <td>{{ institution.position }}</td>
+</tr>
+<tr>
+    <td>Дата поступления:</td>
+    <td>{{ institution.start_date }}</td>
+</tr>
+<tr>
+    <td>Дата окончания:</td>
+    <td>{{ institution.finish_date }}</td>
+</tr>
+<tr>
+    <td></td>
+    <td>&nbsp;</td>
+</tr>
+{% endfor %}
+
+
+<tr>
+    <td>Опыт работы:</td>
+    <td>
+        {% if not member.works %} Не заполнено {% endif %}
+    </td>
+</tr>
+
+ {% for institution in member.works %}
+<tr>
+    <td>Организация:</td>
+    <td>{{ institution.organization }}</td>
+</tr>
+<tr>
+    <td>Должность:</td>
+    <td>{{ institution.position }}</td>
+</tr>
+<tr>
+    <td>Дата начала работы:</td>
+    <td>{{ institution.start_date }}</td>
+</tr>
+<tr>
+    <td>Дата окончания работы:</td>
+    <td>{{ institution.finish_date|default:"Работает по текущее время" }}</td>
+</tr>
+<tr>
+    <td></td>
+    <td>&nbsp;</td>
+</tr>
+{% endfor %}
+
+<tr>
+    <td>Дополнительные сведения:</td>
+    <td>{{member.info|if_empty:"Не заполнено"}}</td>
+</tr>
+</table>
+<hr style=" border-top: 2px solid black;">
+{% endfor %}
+

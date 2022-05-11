@@ -1,0 +1,117 @@
+<div class="form-group row">
+    <label for="direction" class="col-sm-4 col-form-label">
+        1. Грантовое направление, которому преимущественно соответствует планируемая деятельность по
+        проекту*
+    </label>
+    <div class="col-sm-8">
+        <select v-model="project.direction_id" @change="onChangeDirection($event)" class="selectpicker" id="direction">
+            <option value="" selected disabled>Выбрать грантовое направление</option>
+            <option style="width: 100px" v-for="item in directions" :key="item.id" :value="item.id">
+                [[item.title]]
+            </option>
+        </select>
+        <small>
+            Данное поле обязательно для заполнения.<br>
+            Следует выбрать грантовое направление из списка.
+        </small>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="subject" class="col-sm-4 col-form-label">
+        1.1. Тематика грантового направления, которому преимущественно соответствует планируемая
+        деятельность по проектуw
+    </label>
+    <div class="col-sm-8">
+        <select v-model="project.subject_id" class="selectpicker" id="subject">
+            <option value="" selected disabled>Выбрать тематику направления</option>
+            <option v-for="item in subs" :key="item.id" :value="item.id">
+                [[item.title]]
+            </option>
+        </select>
+        <small>Данное поле не обязательно для заполнения.<br>
+        Можно выбрать тематику грантового направления из списка.</small>
+    </div>
+</div>
+
+<onetext :required="true" label="2. Название проекта, на реализацию которого запрашивается грант" v-model="project.title" max=500
+    description="Название проекта следует писать без кавычек, с заглавной буквы, без точки в конце. После
+    подачи заявки название проекта изменить нельзя."></onetext>
+
+<onetext :required="true" label="3. Краткое описание проекта (деятельности в рамках проекта)" v-model="project.description" max=3000
+    description="По сути, это текстовая презентация проекта, отражающая основную идею проекта, 
+    целевую аудиторию, содержание проекта и наиболее значимые ожидаемые результаты. 
+    Текст краткого описания будет общедоступным (в том числе в форме публикаций в СМИ и в сети Интернет). 
+    Для экспертов, оценивающих заявку, это поле должно содержать ёмкий и исчерпывающий ответ на вопрос: 
+    «Что и для кого заявитель хочет сделать, на какую работу запрашивает грант?». Более развернутое описание 
+    проекта по желанию заявителя можно будет загрузить в виде файла PDF в поле 7.1."></onetext>
+
+<geography :id="project.id" type="project" label="4. География проекта" 
+    description="География должна быть реалистичной: следует перечислить только те населенные пункты и территории, где непосредственно будут проводиться мероприятия проекта и (или) где находятся представители целевых групп, с которыми запланировано взаимодействие в рамках мероприятий проекта.
+    Рекомендуется проверить, подтверждена ли актуальность проблемы целевой группы на каждой из указанных территорий в п.7 раздела «О проекте».
+    Важно убедиться, что деятельность на территории, где непосредственно будут проводиться мероприятия, не противоречит уставу организации">
+</geography>
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        5. Дата начала реализации проекта*
+    </label>
+    <div class="col-sm-8">
+        <date-picker value-type="YYYY-MM-DD" format="DD.MM.YYYY" v-model="project.start_date" lang="ru"
+            :disabled-date="disabledProjectDates">
+        </date-picker>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        6. Дата окончания реализации проекта*
+    </label>
+    <div class="col-sm-8">
+        <date-picker value-type="YYYY-MM-DD" format="DD.MM.YYYY" v-model="project.finish_date" lang="ru"
+            :disabled-date="disabledProjectDates">
+        </date-picker>
+    </div>
+</div>
+
+<onetext :required="true" label="7. Обоснование социальной значимости проекта" v-model="project.social_significance" max=5000
+    description="Следует подробно описать проблемы целевой группы, которые планируется решить в рамках проекта. 
+Если целевых групп несколько — необходимо описать проблемы каждой из них."></onetext>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        7.1. Полное описание проекта, презентация проекта:
+    </label>
+    <div class="col-sm-8">
+        <upload type="presentation" project_id="{{project_id|cut:" "}}" :csrf_token="csrf_token"></upload>
+    </div>
+</div>
+
+
+<multicomplete :required="true" type="project" label="8. Целевые группы проекта" v-model="project.target_groups" max=600 description=""></multicomplete>
+
+<multitext :required="true" label="9. Цели проекта" max-items=3 v-model="project.goals" max=600 description=""></multitext>
+
+<multitext :required="true" label="10. Задачи проекта. Нумеруйте каждую задачу." max-items=10 rows="2" v-model="project.jobs" max=600 description=""></multitext>
+
+<partners label="11. Партнеры проекта*"></partners>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        11.1. Письма поддержки, соглашения о сотрудничестве и иные аналогичные документы:
+    </label>
+    <div class="col-sm-8">
+        <upload type="letter" project_id="{{project_id|cut:" "}}" :csrf_token="csrf_token"></upload>
+    </div>
+</div>
+
+<onetext :required="true" label="12. Как будет организовано информационное сопровождение проекта" v-model="project.info_support" max=1000
+    description=""></onetext>
+
+<quantresults label="13. Количественные результаты"></quantresults>
+
+<onetext :required="true" label="14. Качественные результаты" v-model="project.quality_results" max=1000 description="">
+</onetext>
+
+<onetext :required="true" label="15. Дальнейшее развитие проекта" v-model="project.further_progress" max=2500 description=""></onetext>
+
+<onetext :required="true" label="16. Источники ресурсного обеспечения проекта в дальнейшем" v-model="project.sources" max=500
+    description=""></onetext>

@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <style>
+        .project-status {
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .project-title {
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            text-transform: uppercase;
+            padding-bottom: 40px;
+        }
+
+        .project-meta {
+            text-align: center;
+            border-top: 1px solid rgb(156, 156, 156);
+            padding: 8px;
+            margin: 8px;
+        }
+
+        .project-budget {
+            min-height: 400px;
+            text-align: center;
+        }
+
+        .project-budget-data {
+            position: absolute;
+            z-index: 2;
+            left: 50%;
+            top: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .project-budget canvas {
+            margin: auto;
+        }
+
+        .project-info {
+            text-align: justify;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 50px;
+        }
+
+        .project-info h4 {
+            text-align: center;
+            font-size: 34px;
+            padding-bottom: 8px;
+        }
+
+        .project-menu {
+            text-align: center;
+            margin-top: 8px;
+            margin-bottom: 30px;
+        }
+
+        .project-menu a {
+            margin-left: 2px;
+            margin-right: 2px;
+        }
+
+        .project-budget div p {
+            font-size: 28px;
+        }
+
+        .project-budget div h6 {
+            margin-left: auto;
+            margin-right: auto;
+            width: 250px;
+        }
+
+        .star {
+            color: #ffd700;
+        }
+
+    </style>
+    <div class="container">
+        <h2><a href="{% url 'project-home' %}">Проекты</a></h2>
+
+        <div class="project-status">
+            Статус проекта: 
+            {% if project.status == project.NEW %}
+                Подана
+            {% elif project.status == project.ON_CHECK %}
+                На проверке
+            {% elif project.status == project.REJECT %}
+                Отклонена
+            {% elif project.status == project.ON_EXAM %}
+                На экспертизе
+            {% elif project.status == project.WIN %}
+                Победитель конкурса
+            {% elif project.status == project.NOT_WIN %}
+                Проект, не получивший поддержку
+            {% endif %}
+        </div>
+        <div class="project-title">
+            {{ project.title }}
+        </div>
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="project-meta">
+                    <h6>Конкурс</h6>
+                    {{ project.contest }}
+                </div>
+                <div class="project-meta">
+                    <h6>Грантовое направление</h6>
+                    {{ project.direction }}
+                </div>
+                {% if project.status == project.WIN or project.status == project.NOT_WIN %}
+                <div class="project-meta">
+                    <h6>Рейтинг заявки</h6>
+                    <i class="fa fa-star star"></i>&nbsp; {{ project.averange_score }}
+                </div>
+                {% endif %}
+
+                <div class="project-meta">
+                    <h6>Номер заявки</h6>
+                    {{ project.id }}
+                </div>
+                <div class="project-meta">
+                    <h6>Дата подачи</h6>
+                    {% if project.request_date %}
+                        {{ project.request_date|date:"d E Y" }}
+                    {% else %}
+                        {{ project.created_on|date:"d E Y" }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-sm-6 project-budget">
+                <canvas id="donut" width="400" height="400"></canvas>
+                <div class="project-budget-data">
+                    <div class="project-budget-request-sum">
+                        <h6 style="color: #20454A"><b>Запрашиваемая сумма</b></h6>
+                        <p>{{ project.budget_request_sum }} ₽</p>
+                    </div>
+                    <div class="project-budget-co-finance">
+                        <h6 style="color: #BAAE50"><b>Cофинансирование</b></h6>
+                        <p>{{ project.budget_co_financing_sum }} ₽</p>
+                    </div>
+                    <div class="project-budget-sum">
+                        <h6 style="color: #508E96"><b>Общая сумма расходов на реализацию проекта</b></h6>
+                        <p>{{ project.budget_sum }} ₽</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="project-meta">
+                    <h6>Сроки реализации</h6>
+                    {{ project.start_date }} - {{ project.finish_date }}
+                </div>
+                <div class="project-meta">
+                    <h6>Организация</h6>
+                    {{ project.organization.short_name }}
+                </div>
+                <div class="project-meta">
+                    <h6>ИНН</h6>
+                    {{ project.organization.inn }}
+                </div>
+                <div class="project-meta">
+                    <h6>ОГРН</h6>
+                    {{ project.organization.ogrn }}
+                </div>
+            </div>
+        </div>
+        <div class="project-menu">
+            <a href="#description" class="materials-btn" role="button">Краткое описание</a>
+            <a href="#goals" class="materials-btn" role="button">Цель</a>
+            <a href="#jobs" class="materials-btn" role="button">Задачи</a>
+            <a href="#social_significance" class="materials-btn" role="button">Обоснование социальной значимости</a>
+            <a href="#geography" class="materials-btn" role="button">География проекта</a>
+            <a href="#target_groups" class="materials-btn" role="button">Целевые группы</a>
+        </div>
+        <div class="project-info">
+            <a href="#description"></a>
+            <h4>Краткое описание</h4>
+
+            {{ project.description|linebreaks }}
+        </div>
+
+        <div class="project-info">
+            <a id="goals"></a>
+            <h4>Цель</h4>
+
+            <ol>
+                {% for goal in project.goal_set.all %}
+                    <li>{{ goal.content }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+
+        <div class="project-info">
+            <a id="jobs"></a>
+            <h4>Задачи</h4>
+
+            <ul>
+                {% for job in project.job_set.all %}
+                    <li>{{ job.content }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="project-info">
+            <a id="social_significance"></a>
+            <h4>Обоснование социальной значимости</h4>
+
+            {{ project.social_significance|linebreaks }}
+        </div>
+
+        <div class="project-info">
+            <a id="geography"></a>
+            <h4>География проекта</h4>
+
+            {% if not project.geography_list %} Не заполнено {% endif %}
+            <ul>
+                {% for geo in project.geography_list %}
+                    <li>{{ geo }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="project-info">
+            <a id="target_groups"></a>
+            <h4>Целевые группы</h4>
+
+            {% if not project.target_groups %} Не заполнено {% endif %}
+            <ol>
+                {% for group in project.target_groups %}
+                    <li>{{ group.title }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+
+        <div class="project-info">
+            <h4>Контактная информация</h4>
+            <p>{{ project.organization.address }}</p>
+            {{ project.organization.web|default:"Не заполнено"|urlize }}
+        </div>
+
+        <div class="project-menu">
+            <a href="{% url 'project-home' %}" class="materials-btn" role="button">Вернуться к проектам</a>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            let request = parseInt("{{ project.budget_request_sum }}".replace(/\s/g, ''));
+            let cofinancing = parseInt("{{ project.budget_co_financing_sum }}".replace(/\s/g, ''));
+
+            new Chart(donut.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    datasets: [
+                        {
+                            backgroundColor: ['#20454A', '#BAAE50'],
+                            borderWidth: 1,
+                            borderColor: ['#20454A', '#BAAE50'],
+                            data: [request, cofinancing]
+                        },
+                        {
+                            backgroundColor: '#508E96',
+                            borderWidth: 1,
+                            borderColor: '#508E96',
+                            data: [request + cofinancing]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: false,
+                    cutoutPercentage: 90,
+                    animation: {
+                        animateRotate: false
+                    },
+                    tooltips: {
+                         enabled: false
+                    }
+                }
+            });
+        })();
+    </script>
+
+
+{% endblock %}

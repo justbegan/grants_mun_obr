@@ -1,0 +1,19 @@
+{% load auth_extras %}
+
+{% if project.organization.have_checklist %}
+    {% if True %}
+        <h4 class="alert alert-warning">У вас есть замечания по доработке</h4>
+        <a data-toggle="collapse" href="#comments" aria-expanded="false" aria-controls="comments">
+            Показать/скрыть замечания
+        </a>
+        <div class="collapse" id="comments">
+            {% for x in project.organization.checklist %}
+              {% if x.value == False %}
+                <div class="alert alert-warning small">
+                  {{x.message|safe}} {{x.comment}}
+                </div>
+              {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endif %}

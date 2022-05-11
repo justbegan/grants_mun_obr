@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <a href="{% url 'user-view-project' project.id %}">Назад к проекту</a>
+        <h2>Результаты экспертизы</h2>
+        <b>Заявка №</b> {{ project.id }}<br>
+        <b>Название проекта:</b> {{ project.title }}
+
+        <table class="table table-sm">
+        <tr>
+            <th>Критерий</th>
+            <th>Оценка</th>
+        </tr>
+        {% for c in criteria %}
+            <tr>
+                <td>{{ c.title }}</td> <td>{{ c.score }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        <b>Общий рейтинг заявки: {{ project.averange_score }}</b>
+    </div>
+{% endblock %}

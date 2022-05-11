@@ -1,0 +1,28 @@
+{% extends 'admin/change_list.html' %}
+
+{% block object-tools %}
+    {{ block.super }}
+    <script>
+    if (!$) {
+        $ = django.jQuery;
+    }
+    $(document).ready(function() {
+        $('td input').bind('paste', null, function(e) {
+            $input = $(this);
+            $input[0].type = 'text';
+            $input[0].value = '';
+
+            setTimeout(function() {
+                var values = $input.val().split(/\s+/),
+                    row = $input.closest('tr'),
+                    col = $input.closest('td').index();
+                $input[0].type = 'number';
+                for (var i = 0; i < values.length; i++) {
+                    row.children().eq(col).find('input').val(values[i]);
+                    row = row.next();
+                }
+            }, 0);
+        });
+    });
+    </script>
+{% endblock %}

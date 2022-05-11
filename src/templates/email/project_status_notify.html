@@ -1,0 +1,5 @@
+<h4>{{ message }}</h4>
+
+{% if project %}
+    <a href="https://grants.yakutia.click{% url 'user-view-project' project.id  %}"> Открыть заявку </a>
+{% endif %}

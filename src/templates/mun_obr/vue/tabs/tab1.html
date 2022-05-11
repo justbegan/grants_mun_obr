@@ -1,0 +1,94 @@
+{% verbatim %}
+
+
+  <div class="form-group">
+
+    <h7>Процент заполнения</h7>
+  <!--Процент заполнения-->
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" v-bind:style="{width:perc}" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">{{percent}}%</div>
+    </div>
+  <!--Процент заполнения end-->
+
+    <form v-on:submit.prevent="onSubmit" ref="my_input">
+
+   
+  <label for="exampleInputEmail1">Название</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input0" v-model="create_st.title">
+ 
+  <label for="exampleInputEmail1">Запрашиваемая сумма гранта, руб.</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input1" v-model="create_st.requested_sum">
+ 
+  <label for="exampleInputEmail1">Сумма расходов, планируемых к осуществлению в текущем финансовом году на оказание на конкурсной основе поддержки 
+    некоммерческим неправительственным организациям в данном субъекте Российской Федерации, на софинансирование которых запрашивается грант, руб.</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input2" v-model="create_st.sum_expenses">
+ 
+  <label for="exampleInputEmail1">Источник (источники) финансового обеспечения таких расходов (без учета запрашиваемого гранта)</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input3" v-model="create_st.source">
+ 
+  <label for="exampleInputEmail1">Действующие редакции нормативных правовых актов субъекта Российской Федерации и иных документов, регулирующих оказание на конкурсной основе поддержки 
+    некоммерческим неправительственным организациям в данном субъекте Российской Федерации.*</label>
+    <input type="file" class="form-control" placeholder="Введите данные" value="" id="tab_1_file_1" @change="uploadFile" ref="file">
+  
+ 
+  <label for="exampleInputEmail1">Сайт в сети Интернет, используемый заявителем для размещения информации и документов об оказании на конкурсной основе поддержки социально 
+    ориентированным некомемрческим организациям в данном субъекте Российской Федерации.
+    С возможностью набора текста, редактирования, удаления, сохранения и восстановления.
+    </label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input5" v-model="create_st.link">
+ 
+  <label for="exampleInputEmail1">Тип получателя софинансирования</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input6" v-model="create_st.recipient_type">
+
+  <label for="exampleInputEmail1">ОГРН</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input6" v-model="create_st.ogrn">
+ 
+  <label for="exampleInputEmail1">Сведения из ЕГРЮЛ</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input7" v-model="create_st.egryl_info">
+ 
+  <label for="exampleInputEmail1">ИНН</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input8" v-model="create_st.inn">
+ 
+  <label for="exampleInputEmail1">КПП</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input9" v-model="create_st.kpp">
+ 
+  <label for="exampleInputEmail1">Полное наименование получателя гранта</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input10" v-model="create_st.full_name_grantee">
+
+  <label for="exampleInputEmail1">Сокращенное наименование получателя софинансирования</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input11" v-model="create_st.short_name_grantee">
+
+
+  <p class="text-center main_label"><b>Руководитель (органа исполнительной власти/некоммерческой организации)</b></p>
+
+  <label for="exampleInputEmail1">Фамилия</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="create_st.d_f_name">
+
+  <label for="exampleInputEmail1">Имя</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="create_st.d_s_name">
+
+  <label for="exampleInputEmail1">Отчество</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="create_st.d_m_name">
+
+  <label for="exampleInputEmail1">Должность руководителя</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="create_st.d_position">
+
+  <label for="exampleInputEmail1">Контактный номер руководителя</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="create_st.d_phone">
+
+  <label for="exampleInputEmail1">Адрес электронной почты для направления юридически значимых сообщений</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="create_st.d_mail">
+
+  <label for="exampleInputEmail1">Сумма просроченной задолженности заявителя по возврату средств, полученных из федерального бюджета, руб.</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="create_st.d_amount_of_overdue_debt">
+
+  <label for="exampleInputEmail1">Файл</label>
+  <input type="file" class="form-control" placeholder="Введите данные" value="" id="input13" @change="uploadFile" ref="file">
+
+  <button class="btn btn-dark pull-right">Создать письмо</button>
+
+ </form>
+  </div>
+
+
+  {% endverbatim %}

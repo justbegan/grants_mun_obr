@@ -1,0 +1,98 @@
+<div class="form-group">
+    <div>
+        <label for="description" class="label">
+            Краткое описание исполнения проекта со следующими пояснениями: Необходимо загрузить текст на русском языке,
+            состоящий из не более 3000 знаков содержащий краткое описание реализации проекта
+            (   - цели, задачи,
+                - описание проекта,
+                - руководитель проекта,
+                - предыстория реализации проекта,
+                - дальнейшее развитие проекта,
+                - какие мероприятия проведены,
+                - кто участвовал в реализации инициативы и др.).
+        </label>
+        <textarea required id="description" class="form-control" name="description" maxlength="3000" rows="3">{{ best.description }}</textarea>
+    </div>
+    <div>
+        <label for="beneficiaries_count" class="label">Количество благополучателей по итогам реализации проекта</label>
+        <input id="beneficiaries_count" class="form-control" name="beneficiaries_count" type="number" min="0" required value="{{ best.beneficiaries_count }}"/>
+    </div>
+
+    <div>
+        <label for="volunteers_count" class="label">Количество добровольцев, привлеченных к реализации проекта</label>
+        <input id="volunteers_count" class="form-control" name="volunteers_count" type="number" min="0" required value="{{ best.volunteers_count }}"/>
+    </div>
+
+    <div>
+        <label for="self_co_financing" class="label">Размер софинансирования проекта из собственных средств</label>
+        <input id="self_co_financing" class="form-control" name="self_co_financing" type="number" min="0" required value="{{ best.self_co_financing|stringformat:".2f"  }}"/>
+    </div>
+
+    <div>
+        <label for="additional_amount" class="label">Объем средств, дополнительно привлеченных на реализацию проекта (включая примерную оценку труда добровольцев, безвозмездно полученных товаров, работ, услуг, имущественных прав) с краткой аналитической информацией об источнике финансирования</label>
+        <input id="additional_amount" class="form-control" name="additional_amount" type="number" min="0" required value="{{ best.additional_amount|stringformat:".2f" }}"/>
+    </div>
+
+    <div>
+        <label for="targets" class="label">
+            Достижение целевых показателей (Краткая информация о достижении показателей указанных в соглашении)
+        </label>
+        <textarea required id="targets" class="form-control" name="targets" rows="3">{{ best.targets }}</textarea>
+    </div>
+
+    <div>
+        <label for="links" class="label">
+            Достижение целевых показателей (Краткая информация о достижении показателей указанных в соглашении)
+        </label>
+        <textarea required id="links" class="form-control" name="links" rows="3">{{ best.links }}</textarea>
+    </div>
+    <hr>
+</div>
+
+<div style="" class="clearfix best-buttons">
+    <button class="import btn btn-primary float-right" data-action="save">Сохранить изменения</button>
+</div>
+
+<script>
+    $(function () {
+        let ajax = false;
+
+        function buttons() {
+            let error = false
+            $('.best-buttons button').on('click', function () {
+                let data = {
+                    description: document.getElementById("description").value,
+                    beneficiaries_count: document.getElementById("beneficiaries_count").value,
+                    volunteers_count: document.getElementById("volunteers_count").value,
+                    self_co_financing: document.getElementById("self_co_financing").value,
+                    targets: document.getElementById("targets").value,
+                    additional_amount: document.getElementById("additional_amount").value,
+                    links: document.getElementById("links").value,
+                }
+                if (!error && !ajax) {
+                    ajax = true;
+                    $.ajax({
+                        type: 'post',
+                        data: {
+                            csrfmiddlewaretoken: csrf,
+                            best_json: JSON.stringify(data),
+                            type: 'best',
+                            isUser: true
+                        },
+                        success: function (r) {
+                            //console.log(r);
+                            ajax = false;
+                            window.location.reload();
+                        },
+                        error: function () {
+                            ajax = false;
+                            customMsg('Не удалось сохранить изменения', true);
+                        }
+                });
+            }
+            });
+        }
+
+        buttons();
+    })
+ </script>

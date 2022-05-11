@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+{% block content %}
+    {% load static %}
+    {% load auth_extras %}
+
+    <script src="{% static 'js/jquery/jquery-ui.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui.min.css' %}" />
+
+    <script>
+        /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
+        /* Written by Andrew Stromnov (stromnov@gmail.com). */
+        ( function( factory ) {
+            "use strict";
+
+            if ( typeof define === "function" && define.amd ) {
+
+                // AMD. Register as an anonymous module.
+                define( [ "../widgets/datepicker" ], factory );
+            } else {
+
+                // Browser globals
+                factory( jQuery.datepicker );
+            }
+        } )( function( datepicker ) {
+            "use strict";
+
+            datepicker.regional.ru = {
+                closeText: "Закрыть",
+                prevText: "&#x3C;Пред",
+                nextText: "След&#x3E;",
+                currentText: "Сегодня",
+                monthNames: [ "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" ],
+                monthNamesShort: [ "Янв", "Фев", "Мар", "Апр", "Май", "Июн",
+                    "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек" ],
+                dayNames: [ "воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота" ],
+                dayNamesShort: [ "вск", "пнд", "втр", "срд", "чтв", "птн", "сбт" ],
+                dayNamesMin: [ "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" ],
+                weekHeader: "Нед",
+                dateFormat: "dd.mm.yy",
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: "" };
+            datepicker.setDefaults( datepicker.regional.ru );
+
+            return datepicker.regional.ru;
+
+        } );
+    </script>
+
+    <style type="text/css">
+        .tabs > ul {
+            margin-left: -20px;
+        }
+
+        .tabs >
+        ul li {
+            vertical-align: top;
+            display: inline-block;
+            padding: 8px;
+            margin-right: 1px;
+            background: #f5fafe;
+            width: 180px;
+        }
+
+        .tabs, ul a {
+            color: black;
+        }
+
+        .is-active {
+            background: #508E96 !important;
+        }
+
+        a .is-active {
+            color: white !important;
+        }
+
+        textarea {
+            width: 100%;
+        }
+
+        lg-container {
+            width: 100px;
+            margin: 0 auto;
+        }
+
+        table.summary-table tr td {
+            font-size: 11px;
+        }
+
+        .expense-type {
+            font-weight: bold;
+        }
+        .doc-w li {
+            word-break: break-all;
+        }
+        .file-delete, .field-delete {
+            cursor: pointer;
+            color: red;
+        }
+
+        .overall-td input {
+            display: none;
+        }
+    </style>
+
+    <div class="container-fluid">
+
+        {% if project.is_has_report %}
+            <div class="float-right">
+                Срок сдачи отчетности:
+                {% if project.report_date %}
+                    {{ project.report_date }}
+                {% else %}
+                    {{ project.contest.reportperiod.date|default:'не задано' }}
+                {% endif %}
+                <br>
+                Статус отчетности: <span class="report-status-{{ project.report_status }}">{{ project.report_status_name }}</span>
+            </div>
+        {% endif %}
+
+        <h2>Соглашение</h2>
+        Заявка <b>№{{ project.id }}</b>
+
+        <br><br>
+        <div class="row">
+            <div class="col-sm-2">
+                <ul class="list-group">
+                    <li class="list-group-item active">Меню проекта</li>
+                    <a href="{% url 'user-view-project' project.id %}" class="list-group-item list-group-item-action">Заявка</a>
+                    {% comment %}{% if project.status == project.WIN %}
+                        <a href="{% url 'user-report-project' project.id %}"
+                           class="list-group-item list-group-item-action">Отчет</a>
+                    {% endif %}{% endcomment %}
+                    <li class="list-group-item">
+                        <a href="{% url 'project-pdf' project.id %}">
+                            Печать заявки
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'user-agreements-project' project.id %}">
+                            Соглашение
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'user-reporting-project' project.id %}">
+                            Отчетность
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-10">
+                <h4>{{ project.title }}</h4>
+                <div>
+                    <div class="tabs float-right">
+                        <ul>
+                            <select id = "report_status_id" name= "report_status_name" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                                <option selected>{{ project.report_status_name }}</option>
+                                <option value="realization">Реализуется</option>
+                                <option value="expire">Не сдан</option>
+                                <option value="check">На проверке</option>
+                                <option value="completion">На доработке</option>
+                                <option value="accept">Принят</option>
+                            </select>
+
+                            <a href="#plan">
+                                <li class="is-active">Отчет по исполнению Календарного плана</li>
+                            </a>
+                            <a href="#achievment">
+                                <li class="">Отчет о достижении показателей</li>
+                            </a>
+                            <a href="#costs">
+                                <li class="">Отчет о расходах</li>
+                            </a>
+                            <a href="#best">
+                                <li class="">Конкурс лучших проектов</li>
+                            </a>
+                            <a href="#results">
+                                <li class="">Итоги проверки</li>
+                            </a>
+                        </ul>
+                    </div>
+                    <br><br><br><br>
+                    <div class="tabs-details">
+                        <div>
+                            {% include "user/reporting-project/plan.html" %}
+                        </div>
+                        <div style="display: none">
+                            {% include "user/reporting-project/achievement.html" %}
+                        </div>
+                        <div style="display: none">
+                            {% include "user/reporting-project/costs.html" %}
+                        </div>
+                        <div style="display: none">
+                            {% include "user/reporting-project/best.html" %}
+                        </div>
+                        <div style="display: none">
+                            {% include "user/reporting-project/results.html" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    $(function () {
+        $('.tabs a').on('click', function() {
+            $('.tabs li.is-active').removeClass('is-active');
+            $(this).children().addClass('is-active');
+            const i = $('.tabs a').index($(this));
+            $('.tabs-details').children().hide();
+            $('.tabs-details').children().eq(i).show();
+        });
+        if (window.location.hash) {
+            $('.tabs a').each(function() {
+                if ($(this).attr('href') == window.location.hash) {
+                    $(this).click();
+                }
+            });
+        }
+        // reporting common
+        $(".jq-dt").datepicker();
+
+        const $m = $('#reporting-modal').modal({show: false}).on('hidden.bs.modal', function (e) {
+            const z = $(this).find('.modal-body').children().hide();
+            z.appendTo($('#'+entityType+'-table tr[data-id='+entityId+'] .reporting-links'));
+        });
+
+        let entityId;
+        let entityType;
+        let ajax = false;
+
+        function links() {
+            $('.reporting-links a').on('click', function () {
+                const type = $(this).data('type');
+                let title, html;
+                switch (type) {
+                    case 'links':
+                        title = 'Ссылки';
+                        break;
+                    case 'photo':
+                        title = 'Фотографии';
+                        break;
+                    case 'doc':
+                        title = 'Документы';
+                        break;
+                }
+                entityId = $(this).parents('tr').data('id');
+                entityType = $(this).parent().data('type');
+                const $w = $(this).parent().children('.' + type + '-w');
+                $m.find('.modal-title').text(title);
+                $w.appendTo($m.find('.modal-body')).show();
+                $m.modal('show');
+            });
+
+            linksForm();
+
+        }
+
+        function linksForm() {
+            $('.links-w form').on('submit', function () {
+                const d = [];
+                $(this).find('input').each(function () {
+                    const id = $(this).data('id') ? $(this).data('id') : null;
+                    const v = $(this).val().trim();
+                    if (v.length || id) {
+                        d.push({
+                            id: id,
+                            url: v
+                        });
+                    }
+                });
+                if (!ajax) {
+                    ajax = true;
+                    $.ajax({
+                        type: 'post',
+                        data: {
+                            csrfmiddlewaretoken: csrf,
+                            links_json: JSON.stringify(d),
+                            type: 'links',
+                            entityId: entityId,
+                            entityType: entityType
+                        },
+                        success: function (r) {
+                            ajax = false;
+                            //console.log(r);
+                            //window.location.reload();
+                            //const $b = $('.tabs-details button:visible:contains("Сохранить изменения")');
+                            //$b.click();
+                            customMsg('Ссылки сохранены', false, true);
+                            $m.modal('hide');
+                        },
+                        error: function () {
+                            ajax = false;
+                            customMsg('Не удалось добавить ссылки', true);
+                        }
+                    });
+                }
+                return false;
+            });
+
+            $('.links-w button').on('click', function () {
+                switch ($(this).data('action')) {
+                    case 'add':
+                        const $i = $(this).prev().clone().val('');
+                        $(this).before($i);
+                        break;
+                    case 'save':
+
+                        break;
+                }
+            });
+        }
+
+        function fileUploadForms() {
+            $('form[enctype="multipart/form-data"]').on('submit', function() {
+                const cls = 'clicked';
+                const $t = $(this);
+                const notAjax = $t.hasClass('not-ajax');
+                if (!$t.hasClass(cls)) {
+                    $t.addClass(cls);
+                    if (notAjax) {
+                        return true;
+                    } else {
+                        const fd = new FormData(this);
+                        /*
+                        jQuery.each($(this).find('input[type=file]')[0].files, function(i, file) {
+                            fd.append('file', file);
+                        });
+                        */
+                        jQuery.ajax({
+                            data: fd,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            method: 'POST',
+                            success: function(r){
+                                console.log(r);
+                                $m.modal('hide');
+                                customMsg('Файлы добавлены', false, true);
+                                //const $b = $('.tabs-details button:visible:contains("Сохранить изменения")');
+                                //$b.click();
+                            },
+                            error: function () {
+                                customMsg('Не удалось загрузить файлы', true);
+                                $t.removeClass(cls);
+                            }
+                        });
+                    }
+                }
+                return false;
+            });
+        }
+
+
+        links();
+        fileUploadForms();
+
+
+        $('.file-delete').on('click', function() {
+            if (confirm('Вы уверены?')) {
+                const types = ['indicator', 'event', 'expense'];
+                const file = $(this).data('file');
+                //const indicator = $(this).data('indicator');
+                const $span = $(this);
+
+                const data = {
+                    csrfmiddlewaretoken: csrf,
+                    type: 'file-delete',
+                    //indicator: indicator,
+                    file: file
+                }
+                for (let i = 0; i < types.length; i++) {
+                    const k = types[i];
+                    if ($span.data(k)) {
+                        data[k] = $(this).data(k);
+                    }
+                }
+                $.ajax({
+                    type: 'post',
+                    data: data,
+                    success: function () {
+                        $span.parent().remove();
+                    }
+                });
+            }
+        });
+
+
+        $('.field-delete').on('click', function() {
+            if (confirm('Вы уверены?')) {
+                const types = ['event', 'expense'];
+                const $span = $(this);
+
+                const data = {
+                    csrfmiddlewaretoken: csrf,
+                    type: 'field-delete'
+                }
+                for (let i = 0; i < types.length; i++) {
+                    const k = types[i];
+                    if ($span.data(k)) {
+                        data[k] = $(this).data(k);
+                    }
+                }
+                $.ajax({
+                    type: 'post',
+                    data: data,
+                    success: function () {
+                        $span.parents('tr').remove();
+                    }
+                });
+            }
+        });
+
+        $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+    });
+
+    const csrf = '{{ csrf_token }}';
+
+    function convertDateString(s) {
+        const tmp = s.split('.');
+        if (tmp.length === 3)
+            return tmp[2] + '-' + tmp[1] + '-' + tmp[0];
+        else
+            return false;
+    }
+
+    function customMsg(msg, isError, autoHide) {
+        $('#reporting-msg-modal .msg').html(msg);
+        if (isError) {
+            $('#reporting-msg-modal .modal-title').html('Ошибка!');
+            $('#reporting-msg-modal .alert-danger').show();
+            $('#reporting-msg-modal .alert-success').hide();
+        } else {
+            $('#reporting-msg-modal .modal-title').html('Сообщение');
+            $('#reporting-msg-modal .alert-danger').hide();
+            $('#reporting-msg-modal .alert-success').show();
+        }
+        $('#reporting-msg-modal').modal();
+        if (autoHide) {
+            setTimeout(function() {
+                $('#reporting-msg-modal').modal('hide');
+            }, 1000);
+        }
+    }
+    $(document).ready(function(){
+    $(function(){$('#report_status_id').change(function()
+        {   
+
+            $.ajax({
+                url: document.URL,
+                type:'GET',
+                data:{input_status: $('#report_status_id').val()},
+                success: function(response) { if (response.status == 200){ console.log("report_status_change")} },
+
+                });
+
+            });
+        });
+    });
+
+
+    </script>
+
+
+    <div class="modal" tabindex="-1" role="dialog" id="reporting-modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="reporting-msg-modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                    <h5 class="modal-title">Ошибка!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger msg" role="alert" style="margin: 0">
+                        A simple danger alert—check it out!
+                    </div>
+                    <div class="alert alert-success msg" role="alert" style="margin: 0">
+                        A simple success alert—check it out!
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

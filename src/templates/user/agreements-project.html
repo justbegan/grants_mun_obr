@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+{% block content %}
+    {% load static %}
+    {% load auth_extras %}
+
+    <script src="{% static 'js/jquery/jquery-ui.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui.min.css' %}" />
+
+    <div class="container">
+
+        {% if project.is_has_report %}
+            <div class="float-right">
+                Срок сдачи отчетности:
+                {% if project.report_date %}
+                    {{ project.report_date }}
+                {% else %}
+                    {{ project.contest.reportperiod.date|default:'не задано' }}
+                {% endif %}
+                <br>
+                Статус отчетности: <span class="report-status-{{ project.report_status }}">{{ project.report_status_name }}</span>
+            </div>
+        {% endif %}
+
+        <h2>Соглашение</h2>
+        Заявка <b>№{{ project.id }}</b>
+
+        <br><br>
+        <div class="row">
+            <div class="col-sm-3" v-show="showSidebar">
+                <ul class="list-group">
+                    <li class="list-group-item active">Меню проекта</li>
+                    <a href="{% url 'user-view-project' project.id %}" class="list-group-item list-group-item-action">Заявка</a>
+                   {% comment %} {% if project.status == project.WIN %}
+                        <a href="{% url 'user-report-project' project.id %}"
+                           class="list-group-item list-group-item-action">Отчет</a>
+                    {% endif %}{% endcomment %}
+                    <li class="list-group-item">
+                        <a href="{% url 'project-pdf' project.id %}">
+                            Печать заявки
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'user-agreements-project' project.id %}">
+                            Соглашение
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'user-reporting-project' project.id %}">
+                            Отчетность
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-9">
+                {% if project.is_have_agreements %}
+                    <table class="table table-hover table-sm">
+                    <thead>
+                    <tr>
+                        <th>Наименование Соглашения</th>
+                        <th>Наименование проекта</th>
+                        <th>Номер Соглашения</th>
+                        <th>Дата подписания Соглашения</th>
+                        <th>Срок сдачи отчетности</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for a in project.get_agreements %}
+                        <tr>
+                        <td>
+                            <a href="{{ a.file.url }}" target="_blank">{{ a.title }}</a>
+                        </td>
+                        <td>{{ project.title }}</td>
+                        <td>{{ a.number }}</td>
+                        <td>{{ a.date }}</td>
+                        <td>
+                            {% if project.report_date %}
+                                {{ project.report_date }}
+                            {% else %}
+                                {{ project.contest.reportperiod.date|default:'не задано' }}
+                            {% endif %}
+                        </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                {% endif %}
+                {% if project.is_have_additional_agreements %}
+                    <table class="table table-hover table-sm">
+                        <thead>
+                        <tr>
+                            <th>Наименование Дополнительного соглашения</th>
+                            <th>Наименование проекта</th>
+                            <th>Номер Соглашения</th>
+                            <th>Дата подписания Соглашения</th>
+                            <th>Срок сдачи отчетности</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for a in project.get_additional_agreements %}
+                            <tr>
+                                <td>
+                                    <a href="{{ a.file.url }}" target="_blank">{{ a.title }}</a>
+                                </td>
+                                <td>{{ project.title }}</td>
+                                <td>{{ a.number }}</td>
+                                <td>{{ a.date }}</td>
+                                <td>
+                                    {% if project.report_date %}
+                                        {{ project.report_date }}
+                                    {% else %}
+                                        {{ project.contest.reportperiod.date|default:'не задано' }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+                {% if not project.is_have_agreements and not project.is_have_additional_agreements %}
+                    Соглашение отсутствует.
+                {% endif %}
+
+                {% if is_admin_form %}
+                    <br><br><br>
+                    <h5>Срок сдачи отчетности</h5>
+                    <form enctype="multipart/form-data" method="post">
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <input type="text" class="form-control jq-dt" name="srok" required value="{% if project.report_date %}{{ project.report_date|date:'d.m.Y' }}{% else %}{{ project.contest.reportperiod.date|date:'d.m.Y' }}{% endif %}">
+                                </div>
+                            </div>
+                            <div class="col text-right">
+                                <button class="btn btn-primary" type="submit">Сохранить</button>
+                            </div>
+                        </div>
+                        <input name="type" type="hidden" value="srok">
+                        {% csrf_token %}
+                    </form>
+                    <h5>Изменить соглашение</h5>
+                    <form enctype="multipart/form-data" method="post">
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Наименование</label>
+                                    <input type="text" class="form-control" maxlength="500" name="title" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Номер</label>
+                                    <input type="text" class="form-control" name="number" maxlength="50" required>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Дата подписания</label>
+                                    <input type="text" class="form-control jq-dt" name="date" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Файл</label>
+                                    <input type="file" name="file" required>
+                                </div>
+                            </div>
+                            <div class="col text-right">
+                                <button class="btn btn-primary" type="submit">Загрузить</button>
+                            </div>
+                        </div>
+                        <input name="type" type="hidden" value="main">
+                        {% csrf_token %}
+                    </form>
+                    <br><br>
+                    <h5>Добавить дополнительное соглашение</h5>
+                    <form enctype="multipart/form-data" method="post">
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Наименование</label>
+                                    <input type="text" class="form-control" maxlength="500" name="title" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Номер</label>
+                                    <input type="text" class="form-control" name="number" maxlength="50" required>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Дата подписания</label>
+                                    <input type="text" class="form-control jq-dt" name="date" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Файл</label>
+                                    <input type="file" name="file" required>
+                                </div>
+                            </div>
+                            <div class="col text-right">
+                                <button class="btn btn-primary" type="submit">Загрузить</button>
+                            </div>
+                        </div>
+                        <input name="type" type="hidden" value="additional">
+                        {% csrf_token %}
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        $(function () {
+            $(".jq-dt").datepicker();
+        });
+
+        /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
+        /* Written by Andrew Stromnov (stromnov@gmail.com). */
+        ( function( factory ) {
+            "use strict";
+
+            if ( typeof define === "function" && define.amd ) {
+
+                // AMD. Register as an anonymous module.
+                define( [ "../widgets/datepicker" ], factory );
+            } else {
+
+                // Browser globals
+                factory( jQuery.datepicker );
+            }
+        } )( function( datepicker ) {
+            "use strict";
+
+            datepicker.regional.ru = {
+                closeText: "Закрыть",
+                prevText: "&#x3C;Пред",
+                nextText: "След&#x3E;",
+                currentText: "Сегодня",
+                monthNames: [ "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" ],
+                monthNamesShort: [ "Янв", "Фев", "Мар", "Апр", "Май", "Июн",
+                    "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек" ],
+                dayNames: [ "воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота" ],
+                dayNamesShort: [ "вск", "пнд", "втр", "срд", "чтв", "птн", "сбт" ],
+                dayNamesMin: [ "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" ],
+                weekHeader: "Нед",
+                dateFormat: "dd.mm.yy",
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: "" };
+            datepicker.setDefaults( datepicker.regional.ru );
+
+            return datepicker.regional.ru;
+
+        } );
+    </script>
+
+{% endblock %}

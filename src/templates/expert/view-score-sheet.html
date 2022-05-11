@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2">
+            {% include "profile/side.html" %}
+        </div>
+        <div class="col-sm-10">
+        {% include 'expert/_score-sheet-view.html' %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

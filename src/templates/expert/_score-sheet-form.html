@@ -1,0 +1,168 @@
+{% load crispy_forms_tags %}
+{% load auth_extras %}
+
+<form action="" method="post" id="score-sheet-form">
+    {% csrf_token %}
+    <br>
+    {% if request.user|has_group:"admin" %}
+    <table class="table table-sm">
+        <tr>
+            <th>Дополнительные баллы</th>
+            <th></th>
+            <th></th>
+        </tr>
+
+        <tr>
+            <td width="700px">Если организация состоит в реестре исполнителей общественно полезных услуг</td>
+            <td width="100px"> {{ score_sheet_form.additional_score1|as_crispy_field }}</td>
+            <td></td>
+        </tr>
+
+    </table>
+    {% endif %}
+
+    {{ formset.management_form }}
+
+    <table class="table">
+        <tr>
+            <th width="500px">Критерии</th>
+            <th width="200px">Баллы</th>
+            {% comment %} <th>Коэффициент</th> {% endcomment %}
+            <th>Комментарий</th>
+        </tr>
+        {% for form in formset %}
+            {{ form.non_field_errors }}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            <tr data-id="x-form-{{form.instance.criteria.id}}">
+                <td>
+                    <label for="{{ form.score.id_for_label }}">{{ form.instance.criteria }}</label>
+                    <br>
+                    <a data-toggle="collapse" href="#info-{{ form.instance.criteria.id }}"
+                       aria-expanded="false" aria-controls="info-{{ form.instance.criteria.id }}">
+                        Информация
+                    </a>
+                    <small class="collapse" id="info-{{ form.instance.criteria.id }}">
+                        {{ form.instance.criteria.info|default:""|safe }}
+                    </small>
+                </td>
+                <td>
+                    {{ form.score }}
+                    {{ form.score.errors }}
+                </td>
+                {% comment %} <td>
+                    {{ form.instance.coefficient }}
+                </td> {% endcomment %}
+                <td>
+                    {{ form.comment }}
+                    {{ form.comment.errors }}
+                </td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <th>Сумма оценок</th>
+            <th>{{ score_sheet.score_sum }}</th>
+            {% comment %} <th></th> {% endcomment %}
+            <th></th>
+        </tr>
+        <tr>
+            <th>Сумма оценок с учетом коэффициента и дополнительных баллов</th>
+            <th>{{ score_sheet.score_total_sum }}</th>
+            {% comment %} <th></th> {% endcomment %}
+            <th></th>
+        </tr>
+    </table>
+
+
+    <div>
+        {{ score_sheet_form.result|as_crispy_field }}
+    </div>
+    <br>
+
+    <input type="submit" name="save" value="Сохранить" class="btn btn-primary"/>
+    <input type="submit" name="approve" value="Подтвердить" id="btn-approve" class="btn btn-primary" />
+
+
+</form>
+
+<div id="score-sheet-modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Вы уверены, что по следующим критериям выставляете 0 баллов?</h5>
+            </div>
+            <div class="modal-body">
+                <ul id="score-sheet-modal-list"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function enforceMinMax(el) {
+        if (el.value != "") {
+            if (parseInt(el.value) < parseInt(el.min)) {
+                el.value = el.min;
+            }
+            if (parseInt(el.value) > parseInt(el.max)) {
+                el.value = el.max;
+            }
+        }
+    }
+
+    $(function() {
+        'use strict';
+        const $inputs = $('#score-sheet-form input[type=number]').addClass('form-control');
+
+        $('#score-sheet-form #btn-approve').on('click', function() {
+            if ($(this).attr('name') == 'approve') {
+
+                let scrolled = false;
+                let showModal = true;
+                const $ul = $('#score-sheet-modal-list').html('');
+                const $modal = $('#score-sheet-modal').modal({
+                    keyboard: false,
+                    show: false
+                }).on('hide.bs.modal', function(e) {
+                    showModal = false;
+                });
+                $inputs.each(function() {
+                    const val = $(this).val();
+                    if (val == '' || val == 0) {
+                        if (!$(this).hasClass('is-invalid')) {
+                            $(this).addClass('is-invalid')
+                                .after('<div class="invalid-feedback">Вы заполнили это поле?</div>');
+                            if (!scrolled) {
+                                scrolled = true;
+                                $([document.documentElement, document.body]).animate({
+                                    scrollTop: $(this).offset().top
+                                }, 500);
+                            }
+                        }
+                        const criteria = $(this).parent().prev().children('label').text();
+                        $ul.append('<li>' + criteria + '</li>');
+                    }
+                });
+                if (scrolled && showModal) {
+                    $modal.modal('show');
+                    return false;
+                } else {
+                    let result = $('#id_result');
+                    if (result[0].selectedIndex === 0) {
+                        alert('Выберите вывод!');
+                        return false;
+                    }
+                    return confirm('Вы уверены? После подтверждения вы не сможете редактировать этот лист');
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+tr[data-id="x-form-11"]{display:none !important;}
+</style>

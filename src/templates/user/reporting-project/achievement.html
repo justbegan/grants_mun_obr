@@ -1,0 +1,232 @@
+{% load filter %}
+
+<table class="table table-hover table-sm" id="achievement-table">
+    <thead>
+    <tr>
+        <th rowspan="2">№</th>
+        <th rowspan="2">Наименование показателя</th>
+        <th colspan="2">Единица измерения по ОКЕИ/ Единица измерения</th>
+        <th rowspan="2">Срок, на который запланировано достижение показателя</th>
+        <th rowspan="2">Плановое значение показателя</th>
+        <th rowspan="2" data-toggle="tooltip" data-placement="bottom" title="Фактически достигнутое значение по итогам реализации проекта">
+            Фактически достигнутое значение
+        </th>
+        <th rowspan="2" data-toggle="tooltip" data-placement="bottom" title="Подтверждающая информация о достижении значения показателя в виде электронной ссылки на публикации и материалы в СМИ и Интерент, фотографии, список участников, официальное письмо, эфирная справка, копии договоров о трудоустройстве и пр.">
+            Подтверждающая информация</th>
+        <th rowspan="2" data-toggle="tooltip" data-placement="bottom" title="Информация о причине отклонения от планового значения. Почему показатель не достигнут">
+            Причина отклонения</th>
+    </tr>
+    <tr>
+        <th>Наименование</th>
+        <th>Код</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for t in indicator_types %}
+        {% with i=indicators|get_item:t.0 %}
+        <tr data-id="{{ i.id|safe }}" data-type="{{ t.0 }}" data-editable="{{ t.1 }}">
+            <td>{{ t.0 }}</td>
+            <td>{{ t.2 }}</td>
+            <td>{{ t.3 }}</td>
+            <td>{{ t.4 }}</td>
+            {% if t.1 %}
+                {% if is_admin_form %}
+                    <td><input type="text" name="date" value="{{ i.date|default_if_none:''|date:'d.m.Y' }}" class="jq-dt" required /></td>
+                    <td><input type="number" name="planned" value="{{ i.planned|safe|default_if_none:'' }}" required /></td>
+                {% else %}
+                    <td>{{ i.date|default:'-' }}</td>
+                    <td>{{ i.planned|default_if_none:'-' }}</td>
+                {% endif %}
+                {% if is_user_form %}
+                    <td><input type="number" name="value" value="{{ i.value|safe|default_if_none:'' }}" /></td>
+                {% else %}
+                    <td>{{ i.value|default_if_none:'' }}</td>
+                {% endif %}
+                <td class="reporting-links" data-type="achievement">
+                    <a href="javascript:void(0)" data-type="links">Ссылки</a> {{ i.links.count }}<br>
+                    <a href="javascript:void(0)" data-type="photo">Фотографии</a> {{ i.get_photos|length }}<br>
+                    <a href="javascript:void(0)" data-type="doc">Документы</a> {{ i.get_docs|length }}
+                    <div style="display: none" class="links-w">
+                        {% if is_user_form %}
+                            <form>
+                                <ol>
+                                    {% for l in i.links.all %}
+                                        <li><input type="url" name="url" class="form-control" value="{{ l.url }}" data-id="{{ l.id|safe }}" /></li>
+                                    {% endfor %}
+                                </ol>
+                                <input class="form-control" type="url" name="url" placeholder="Введите ссылку" style="margin: 10px 0;" />
+                                <button class="btn btn-secondary" data-action="add" type="button">Добавить</button>
+                                <button class="btn btn-primary float-right" data-action="save">Сохранить</button>
+                            </form>
+                        {% else %}
+                            {% if i.links.all %}
+                                <ol>
+                                    {% for l in i.links.all %}
+                                        <li><a href="{{ l.url }}" target="_blank">{{ l.url }}</a></li>
+                                    {% endfor %}
+                                </ol>
+                            {% else %}
+                                Нет ссылок.
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div style="display: none" class="photo-w">
+                        {% if not i.get_photos %}
+                            <p>Нет фотографий.</p>
+                        {% else %}
+                            <ol>
+                                {% for p in i.get_photos %}
+                                    <li>
+                                        <a href="{{ p.file.url }}" target="_blank">{{ p.get_name }}</a>
+                                        {% if is_user_form %}<span class="file-delete" data-file="{{ p.id|safe }}" data-indicator="{{ i.id|safe }}">удалить</span>{% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        {% endif %}
+                        {% if is_user_form %}
+                            <form method="post" enctype="multipart/form-data">
+                                <input type="file" multiple accept="image/png, image/gif, image/jpeg" name="file">
+                                <input name="type" value="file" type="hidden">
+                                <input name="indicator" value="{{ i.id|safe }}" type="hidden">
+                                <input name="file_type" value="0" type="hidden">
+                                <button class="btn btn-primary float-right" type="submit">Добавить</button>
+                                {% csrf_token %}
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div style="display: none" class="doc-w">
+                        {% if not i.get_docs %}
+                            <p>Нет документов.</p>
+                        {% else %}
+                            <ol>
+                                {% for p in i.get_docs %}
+                                    <li>
+                                        <a href="{{ p.file.url }}" target="_blank">{{ p.get_name }}</a>
+                                        {% if is_user_form %}<span class="file-delete" data-file="{{ p.id|safe }}" data-indicator="{{ i.id|safe }}">удалить</span>{% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        {% endif %}
+                        {% if is_user_form %}
+                            <form method="post" enctype="multipart/form-data">
+                                <input type="file" multiple accept="application/pdf" name="file">
+                                <input name="type" value="file" type="hidden">
+                                <input name="indicator" value="{{ i.id|safe }}" type="hidden">
+                                <input name="file_type" value="1" type="hidden">
+                                <button class="btn btn-primary float-right" type="submit">Добавить</button>
+                                {% csrf_token %}
+                            </form>
+                        {% endif %}
+                    </div>
+                </td>
+                {% if is_user_form %}
+                    <td><textarea class="form-control" name="reason" maxlength="1000">{{ i.reason|default_if_none:'' }}</textarea></td>
+                {% else %}
+                    <td>{{ i.reason|default_if_none:'' }}</td>
+                {% endif %}
+            {% else %}
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+            {% endif %}
+        </tr>
+        {% endwith %}
+    {% endfor %}
+    </tbody>
+</table>
+{% if is_admin_form %}
+    <div style="" class="clearfix achievement-buttons">
+        <button class="import btn btn-primary float-right" data-action="save">Сохранить изменения</button>
+    </div>
+{% endif %}
+{% if is_user_form %}
+    <div style="" class="clearfix achievement-buttons">
+        <button class="import btn btn-primary float-right" data-action="user-save">Сохранить изменения</button>
+    </div>
+{% endif %}
+<div class="text-center">
+    <a href="?task=pdf&type=achievement" class="import btn btn-warning">Сформировать отчёт</a>
+</div>
+
+<script>
+    $(function () {
+        let ajax = false;
+        const $b = $('#achievement-table tbody');
+
+        function buttons() {
+            $('.achievement-buttons button').on('click', function () {
+                switch ($(this).data('action')) {
+                    case 'save':
+                        saveIndicators(false);
+                        break;
+                    case 'user-save':
+                        saveIndicators(true);
+                        break;
+                }
+            });
+        }
+        function saveIndicators(isUser) {
+            const data =[];
+            let error = false;
+            $b.children().each(function () {
+                const $t = $(this);
+                if ($t.data('editable') === 'True') {
+                    const id = $t.data('id') ? $t.data('id') : null;
+                    const type = $t.data('type');
+                    if (isUser) {
+                        const v = $t.find('input[name=value]').val().trim();
+                        const r = $t.find('textarea[name=reason]').val().trim();
+                        data.push({
+                            'type': type,
+                            'id': id,
+                            'value': v ? v : null,
+                            'reason': r ? r : null
+                        });
+                    } else {
+                        const d = $t.find('input[name=date]').val().trim();
+                        const p = $t.find('input[name=planned]').val().trim();
+                        const dateVal = d ? convertDateString(d) : null;
+                        if (dateVal === false) {
+                            error = true;
+                            customMsg('Неверное значение срока.', true);
+                        } else {
+                            data.push({
+                                'type': type,
+                                'id': id,
+                                'date': dateVal,
+                                'planned': p ? p : null
+                            });
+                        }
+                    }
+                }
+            });
+            if (!error && !ajax) {
+                ajax = true;
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        csrfmiddlewaretoken: csrf,
+                        indicators_json: JSON.stringify(data),
+                        type: 'indicators',
+                        isUser: isUser
+                    },
+                    success: function (r) {
+                        //console.log(r);
+                        ajax = false;
+                        window.location.reload();
+                    },
+                    error: function () {
+                        ajax = false;
+                        customMsg('Не удалось сохранить изменения', true);
+                    }
+                });
+            }
+        }
+
+        buttons();
+
+
+    });
+</script>

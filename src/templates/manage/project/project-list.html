@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+{% load auth_extras %}
+{% load render_table from django_tables2 %}
+{% load export_url from django_tables2 %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2">
+            {% include "profile/side.html" %}
+        </div>
+
+        <div  class="col-sm-10">
+            <h2>Все проекты</h2>
+            <form class="form-group" action="" method="get" >
+            <div class="row">
+                <div class="col-sm-3">
+                    {{ filter.form.contest|as_crispy_field }}
+                </div>
+                 <div class="col-sm-3">
+                    {{ filter.form.direction|as_crispy_field }}
+                </div>
+                <div class="col-sm-3">
+                    {{ filter.form.status|as_crispy_field }}
+                </div>
+                <div class="col-sm-3">
+                    {{ filter.form.id|as_crispy_field }}
+                </div>
+                <div class="col-sm-4">
+                    {% if  project_finished %}
+                        <input type="checkbox" name="project_finished" value="True" checked>
+                    {% else %}
+                        <input type="checkbox" name="project_finished" value="True">
+                    {% endif %}
+                     с завершенной экспертизой
+                    <br><br>
+                </div>
+            </div>
+            <input type="submit" value="Применить" class="btn btn-primary btn-sm align-bottom"/>
+            </form>
+            <div> Кол-во заявок: {{ projects_count }}
+                <div class="text-right">
+
+                    <a href="{% export_url "xlsx" %}" class="btn btn-outline-primary btn-circle mb-2">
+                        Загрузить  <code>Excel</code>
+                    </a>
+                    {% comment %} <a href="?export_form=form1" class="btn btn-outline-primary btn-circle mb-2">
+                        form1
+                    </a>
+                    <a href="?export_form=form2" class="btn btn-outline-primary btn-circle mb-2">
+                        form2
+                    </a>
+                    <a href="?export_form=form3" class="btn btn-outline-primary btn-circle mb-2">
+                        form3
+                    </a>
+                    <a href="?export_form=form4" class="btn btn-outline-primary btn-circle mb-2">
+                        form4
+                    </a> {% endcomment %}
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle btn-circle mb-2" data-toggle="dropdown">
+                        Экспорт по форме 
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item show-loader" href="?export_form=form1&{{ request.GET.urlencode }}" >Форма 1</a>
+                            <a class="dropdown-item show-loader" href="?export_form=form2&{{ request.GET.urlencode }}" >Форма 2</a>
+                            <a class="dropdown-item show-loader" href="?export_form=form3&{{ request.GET.urlencode }}" >Форма 3</a>
+                            <a class="dropdown-item show-loader" href="?export_form=form4&{{ request.GET.urlencode }}" >Форма 4</a>
+                        </div>
+                    </div>
+                </div>
+                {% render_table project_table 'django_tables2/bootstrap4.html' %}  
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- The Modal -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div class="text-center p-5">
+            <div class="p-3">
+                Пожалуйста подождите...
+            </div>
+            <div class="spinner-border text-success"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+    $('body').on('click', '.show-loader', function(d){
+        //console.warn('123')
+        $("#myModal").modal('show')
+        setTimeout(()=>{
+            $("#myModal").modal('hide')
+        }, 8000)
+    })
+</script>
+
+{% endblock %}

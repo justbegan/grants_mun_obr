@@ -1,0 +1,377 @@
+{% if is_admin_form %}
+    <div style="margin-bottom: 15px" class="clearfix plan-buttons">
+        {% if not project.reporting_events.all %}
+            <button class="import btn btn-secondary float-left" data-action="import">Скопировать данные из календарного плана</button>
+        {% endif %}
+    </div>
+{% endif %}
+
+<table class="table table-hover table-sm" id="plan-table">
+    <thead>
+    <tr>
+        <th>№</th>
+        <th class="w-25">Мероприятие</th>
+        <th width="145px">Дата начала</th>
+        <th width="145px">Дата окончания</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Текстовая информация об исполнении мероприятия от 500 знаков.">
+            Исполнение
+        </th>
+        <th width="142px" data-toggle="tooltip" data-placement="bottom" title="Информация в виде электронной ссылки на публикации и материалы в СМИ и сети Интернет, фотографии с мероприятий, скриншоты, электронные версии созданных материалов, список участников, волонтеров, программа, резолюция проведенных мероприятий.">
+            Подтверждающая информация
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for event in project.reporting_events.all %}
+        <tr data-id="{{ event.id|safe }}">
+            <td>{{ forloop.counter }}</td>
+            {% if is_admin_form %}
+                <td class="w-25">
+                    <textarea name="name" maxlength="1000" class="form-control">{{event.name}}</textarea>
+                    {% if is_admin_form %}<span class="field-delete" data-event="{{ event.id|safe }}">удалить</span>{% endif %}
+                </td>
+                <td><input name="start_date" value="{{event.start_date|date:'d.m.Y'}}" type="text" class="jq-dt" /></td>
+                <td><input name="finish_date" value="{{event.finish_date|date:'d.m.Y'}}" type="text" class="jq-dt" /></td>
+            {% else %}
+                <td class="w-25">{{event.name}}</td>
+                <td>{{event.start_date}}</td>
+                <td>{{event.finish_date}}</td>
+            {% endif %}
+
+            {% if is_user_form %}
+                <td>
+                    <textarea name="fulfillment" minlength="500" maxlength="10000" class="form-control" placeholder="Введите текст">{{event.fulfillment}}</textarea>
+                    <div style="color:red;"></div>
+                </td>
+            {% else %}
+                <td>{{ event.fulfillment }}</td>
+            {% endif %}
+
+            <td class="reporting-links" data-type="plan">
+                <a href="javascript:void(0)" data-type="links">Ссылки</a> {{ event.links.count }}<br>
+                <a href="javascript:void(0)" data-type="photo">Фотографии</a> {{ event.get_photos|length }}<br>
+                <a href="javascript:void(0)" data-type="doc">Документы</a> {{ event.get_docs|length }}
+                <div style="display: none" class="links-w">
+                    {% if is_user_form %}
+                        <form>
+                            <ol>
+                                {% for l in event.links.all %}
+                                    <li><input type="url" name="url" class="form-control" value="{{ l.url }}" data-id="{{ l.id|safe }}" /></li>
+                                {% endfor %}
+                            </ol>
+                            <input class="form-control" type="url" name="url" placeholder="Введите ссылку" style="margin: 10px 0;" />
+                            <button class="btn btn-secondary" data-action="add" type="button">Добавить</button>
+                            <button class="btn btn-primary float-right" data-action="save">Сохранить</button>
+                        </form>
+                    {% else %}
+                        {% if event.links.all %}
+                            <ol>
+                                {% for l in event.links.all %}
+                                    <li><a href="{{ l.url }}" target="_blank">{{ l.url }}</a></li>
+                                {% endfor %}
+                            </ol>
+                        {% else %}
+                            Нет ссылок.
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div style="display: none" class="photo-w">
+                    {% if not event.get_photos %}
+                        <p>Нет фотографий.</p>
+                    {% else %}
+                        <ol>
+                            {% for p in event.get_photos %}
+                                <li>
+                                    <a href="{{ p.file.url }}" target="_blank">{{ p.get_name }}</a>
+                                    {% if is_user_form %}<span class="file-delete" data-file="{{ p.id|safe }}" data-event="{{ event.id|safe }}">удалить</span>{% endif %}
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    {% endif %}
+                    {% if is_user_form %}
+                        <form method="post" enctype="multipart/form-data">
+                            <input type="file" multiple accept="image/png, image/gif, image/jpeg" name="file">
+                            <input name="type" value="file" type="hidden">
+                            <input name="event" value="{{ event.id|safe }}" type="hidden">
+                            <input name="file_type" value="0" type="hidden">
+                            <button class="btn btn-primary float-right" type="submit">Добавить</button>
+                            {% csrf_token %}
+                        </form>
+                    {% endif %}
+                </div>
+                <div style="display: none" class="doc-w">
+                    {% if not event.get_docs %}
+                        <p>Нет документов.</p>
+                    {% else %}
+                        <ol>
+                            {% for p in event.get_docs %}
+                                <li>
+                                    <a href="{{ p.file.url }}" target="_blank">{{ p.get_name }}</a>
+                                    {% if is_user_form %}<span class="file-delete" data-file="{{ p.id|safe }}" data-event="{{ event.id|safe }}">удалить</span>{% endif %}
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    {% endif %}
+                    {% if is_user_form %}
+                        <form method="post" enctype="multipart/form-data">
+                            <input type="file" multiple accept="application/pdf" name="file">
+                            <input name="type" value="file" type="hidden">
+                            <input name="event" value="{{ event.id|safe }}" type="hidden">
+                            <input name="file_type" value="1" type="hidden">
+                            <button class="btn btn-primary float-right" type="submit">Добавить</button>
+                            {% csrf_token %}
+                        </form>
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+    {% comment %}
+    {% for event in project.event_set.all %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{event.name}}</td>
+            <td>{{event.start_date}}</td>
+            <td>{{event.finish_date}}</td>
+            {% if is_user_form %}
+                <td></td>
+                <td></td>
+            {% else %}
+                <td></td>
+                <td class=""></td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    {% endcomment %}
+    </tbody>
+</table>
+{% if is_admin_form %}
+    <div style="" class="clearfix plan-buttons">
+        <button class="btn btn-secondary" data-action="add">Добавить мероприятие</button>
+        <button class="import btn btn-primary float-right" data-action="save">Сохранить изменения</button>
+    </div>
+{% endif %}
+{% if is_user_form %}
+    <div style="" class="clearfix plan-buttons-user">
+        <button class="import btn btn-primary float-right" data-action="save">Сохранить изменения</button>
+    </div>
+{% endif %}
+
+<div class="text-center">
+    <a href="?task=pdf&type=plan" class="import btn btn-warning">Сформировать отчёт</a>
+</div>
+
+<script>
+    $(function() {
+        const $b = $('#plan-table tbody');
+        const tpl = '<tr>\n' +
+            '        <td></td>\n' +
+            '        <td><textarea name="name" type="text" maxlength="255" class="form-control"></textarea><div style="color:red;"></div></td>\n' +
+            '        <td><input name="start_date" type="text" required class="jq-dt" /></td>\n' +
+            '        <td><input name="finish_date" type="text" required class="jq-dt" /></td>\n' +
+            '    </tr>';
+        let ajax = false;
+
+        $('.photo-w').each(function() {
+            const uploadField = $(this).find('input[type=file]');
+            if (uploadField.length)
+                uploadField[0].onchange = function() {
+                    for (let i = 0; i < this.files.length; i++) {
+                        if (this.files[i].size > 10 * 1024 * 1024){
+                            customMsg("Нельзя загружать фото больше 10 МБ", true);
+                            this.value = "";
+                        }
+                    }
+                };
+        });
+
+        function buttons() {
+            $('.plan-buttons button').on('click', function () {
+                switch ($(this).data('action')) {
+                    case 'import':
+                        importEvents();
+                        break;
+                    case 'save':
+                        saveEvents();
+                        break;
+                    case 'add':
+                        $b.append(tpl);
+                        $(".jq-dt").datepicker();
+                        break;
+                }
+            });
+
+            $('.plan-buttons-user button').on('click', function () {
+                switch ($(this).data('action')) {
+                    case 'save':
+                        saveEventsUser();
+                        break;
+                }
+            });
+        }
+
+        function importEvents() {
+            const eventsData = {{ events_json | safe }};
+            const $a = $b.find('.additional');
+            for (let i = 0; i < eventsData.length; i++) {
+                const d = eventsData[i];
+                const $t = $(tpl);
+                $t.find('textarea').eq(0).val(d['name']);
+                $t.find('input').eq(0).val(d['start']);
+                $t.find('input').eq(1).val(d['end']);
+                //$a.before($t);
+                $b.append($t);
+            }
+            $(".jq-dt").datepicker();
+        }
+
+        function saveEvents() {
+            const d = [];
+            let error = false;
+            $b.children().each(function () {
+                const $t = $(this);
+                const id = $t.data('id') ? $t.data('id') : null;
+                const t = $t.find('textarea[name=name]').val().trim();
+                if (t.length || id) {
+                    const s = $t.find('input').eq(0).val().trim();
+                    const e = $t.find('input').eq(1).val().trim();
+                    if (!s.length || !e.length) {
+                        error = true;
+                        customMsg('Укажите даты мероприятий', true);
+                    } else {
+                        const start = convertDateString(s);
+                        const end = convertDateString(e);
+                        if (start && end)
+                            d.push({
+                                'id': id,
+                                'name': t,
+                                'start_date': start,
+                                'finish_date': end
+                            });
+                        else {
+                            error = true;
+                            customMsg('Неверная дата мероприятия.', true);
+                        }
+                    }
+                }
+            });
+
+            if (!error && !ajax) {
+                ajax = true;
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        csrfmiddlewaretoken: csrf,
+                        events_json: JSON.stringify(d),
+                        type: 'events'
+                    },
+                    success: function (r) {
+                        //console.log(r);
+                        //ajax = false;
+                        window.location.reload();
+                        //window.location.href = window.location.href;
+                    },
+                    error: function () {
+                        ajax = false;
+                        customMsg('Не удалось сохранить изменения', true);
+                    }
+                });
+            }
+        }
+
+        function saveEventsUser() {
+            const d =[];
+            let lengthError = false;
+            let minlength = 0;
+            $b.children().each(function () {
+                const $t = $(this);
+                const $ta = $t.find('textarea[name=fulfillment]');
+                const t = $ta.val().trim();
+                const id = $t.data('id');
+                minlength = parseInt($t.find('textarea[name=fulfillment]').attr('minlength'));
+                d.push({
+                    'id': id,
+                    'fulfillment': t
+                });
+                if (t.length > 0) {
+                    if (t.length < minlength) {
+                        lengthError = true;
+                        $ta.next().html("символов: " + t.length);
+                    } else {
+                        $ta.next().html('');
+                    }
+                }
+            });
+            if (lengthError) {
+                //alert('Поле "Исполнение" должно содержать минимум ' + minlength + ' символов');
+                customMsg('Поле "Исполнение" должно содержать минимум ' + minlength + ' символов (распишите подробнее)', true);
+            }
+            if (!lengthError && !ajax) {
+                ajax = true;
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        csrfmiddlewaretoken: csrf,
+                        events_json: JSON.stringify(d),
+                        type: 'events_fulfillment'
+                    },
+                    success: function (r) {
+                        console.log(r);
+                        ajax = false;
+                        window.location.reload();
+                    },
+                    error: function () {
+                        ajax = false;
+                        customMsg('Не удалось сохранить изменения', true);
+                    }
+                });
+            }
+        }
+
+
+
+        /*
+        function photoForm() {
+            $('.links-w form').on('submit', function () {
+                const d = [];
+                $(this).find('input').each(function () {
+                    const id = $(this).data('id') ? $(this).data('id') : null;
+                    const v = $(this).val().trim();
+                    if (v.length || id) {
+                        d.push({
+                            id: id,
+                            url: v
+                        });
+                    }
+                });
+                if (!ajax) {
+                    ajax = true;
+                    $.ajax({
+                        type: 'post',
+                        data: {
+                            csrfmiddlewaretoken: csrf,
+                            links_json: JSON.stringify(d),
+                            type: 'links',
+                            event: eventId
+                        },
+                        success: function (r) {
+                            ajax = false;
+                            console.log(r);
+                            window.location.href = window.location.href;
+                        },
+                        error: function () {
+                            ajax = false;
+                            alert('error');
+                        }
+                    });
+                }
+                return false;
+            });
+        }
+        */
+        buttons();
+    });
+</script>
+
+
+

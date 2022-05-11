@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+{% block content %}
+    {% load static %}
+    {% load auth_extras %}
+
+    <script src="{% static 'js/vue.js' %}"></script>
+    <script src="{% static 'js/vue-upload-component.js' %}"></script>
+    <style>
+        .tabs > ul {
+            margin-left: -20px;
+        }
+
+        .tabs >
+        ul li {
+            vertical-align: top;
+            display: inline-block;
+            padding: 8px;
+            margin-right: 1px;
+            background: #f5fafe;
+            width: 110px;
+            height: 60px;
+        }
+
+        .tabs, ul a {
+            color: black;
+        }
+
+        .is-active {
+            background: #508E96 !important;
+        }
+
+        a .is-active {
+            color: white !important;
+        }
+
+        textarea {
+            width: 100%;
+        }
+
+        lg-container {
+            width: 100px;
+            margin: 0 auto;
+        }
+
+        table.summary-table tr td {
+            font-size: 11px;
+        }
+    </style>
+    <br>
+    <div class="container">
+        {% if not request.user|has_group:"expert" and not request.user|has_group:"admin" %}
+            <h6><a href="{% url 'user-home' %}">Мои проекты</a></h6>
+        {% endif %}
+        {% if request.user|has_group:"expert" %}
+            <h6>[ <a href="{% url 'expert-home' %}">Назначенные проекты</a>]</h6>
+        {% endif %}
+        {% if request.user|has_group:"admin" %}
+            <h6>[ <a href="{% url 'manage-home' %}">Все проекты</a>]</h6>
+        {% endif %}
+
+        {% if project.is_has_report %}
+            <div class="float-right">
+                Срок сдачи отчетности:
+                {% if project.report_date %}
+                    {{ project.report_date }}
+                {% else %}
+                    {{ project.contest.reportperiod.date|default:'не задано' }}
+                {% endif %}
+                <br>
+                Статус отчетности: <span class="report-status-{{ project.report_status }}">{{ project.report_status_name }}</span>
+            </div>
+        {% endif %}
+
+        <h2>Просмотр проекта</h2>
+        Заявка <b>№ {{ project.id|cut:" " }}</b>
+        {% if project.can_edit %}
+            <a href="{% url 'user-edit-project' project.id %}">Редактировать</a>
+        {% endif %}
+
+        <br><br>
+        <div id="app" class="row">
+            <div class="col-sm-3" v-show="showSidebar">
+                <ul class="list-group">
+                    <li class="list-group-item active">Меню проекта</li>
+                    <a href="{% url 'user-view-project' project.id %}" class="list-group-item list-group-item-action">Заявка</a>
+                    {% comment %}{% if project.status == project.WIN %}
+                        <a href="{% url 'user-report-project' project.id %}"
+                           class="list-group-item list-group-item-action">Отчет</a>
+                    {% endif %}{% endcomment %}
+                    {% if project.status == project.WIN or project.status == project.NOT_WIN %}
+                        <a href="{% url 'user-view-expertise' project.id %}"
+                           class="list-group-item list-group-item-action">Результаты экспертизы</a>
+                    {% endif %}
+                    <li class="list-group-item">
+                        <a href="{% url 'project-pdf' project.id %}">
+                            Печать заявки
+                        </a>
+                    </li>
+
+                    {% if project.is_has_report %}
+                        <li class="list-group-item">
+                            <a href="{% url 'user-agreements-project' project.id %}">
+                                Соглашение
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{% url 'user-reporting-project' project.id %}">
+                                Отчетность
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if request.user|has_group:"admin2" %}
+                        {% if project.status == project.ON_EXAM %}
+                            <a href="{% url 'manage-project-win' project.id %}"
+                               class="list-group-item list-group-item-action">Поддержать</a>
+                            <a href="{% url 'manage-project-not-win' project.id %}"
+                               class="list-group-item list-group-item-action">Не поддержать</a>
+                            <a href="{% url 'manage-assign-experts' project.id %}"
+                               class="list-group-item list-group-item-action">Переназначить экспертов</a>
+
+                        {% elif project.status == project.ON_CHECK %}
+                            <a href="{% url 'manage-assign-experts' project.id %}"
+                               class="list-group-item list-group-item-action">Назначить экспертов</a>
+                            <a href="{% url 'manage-project-to-fix' project.id %}"
+                               class="list-group-item list-group-item-action">На доработку</a>
+                        {% endif %}
+
+                        <a href="{% url 'manage-project-reject' project.id %}"
+                               class="list-group-item list-group-item-action">Отклонить</a>
+                    {% endif %}
+
+                    {% if request.user|has_group:"admin" or request.user|has_group:"admin2" %}
+                        {% if project.status == project.NEW %}
+                            <a href="{% url 'manage-project-to-fix' project.id %}"
+                               class="list-group-item list-group-item-action">На доработку</a>
+                            <a href="{% url 'manage-project-to-check' project.id %}"
+                               class="list-group-item list-group-item-action">На проверку</a>
+                        {% endif %}
+                    {% endif %}
+
+                </ul>
+                <br>
+                <ul class="list-group">
+                    <li class="list-group-item active">Краткая информация заявки</li>
+                    <li class="list-group-item">
+                        <table class="table table-sm summary-table">
+                            <tr>
+                                <td>№ заявки:</td>
+                                <td> {{ project.id|cut:" " }} </td>
+                            </tr>
+                            <tr>
+                                <td>Конкурс:</td>
+                                <td> {{ project.contest }} </td>
+                            </tr>
+                            <tr>
+                                <td>Статус заявки:</td>
+                                <td> 
+                                    {% if project.status == project.NEW %}
+                                        Подана
+                                    {% elif project.status == project.ON_CHECK %}
+                                        На проверке
+                                    {% elif project.status == project.FIX %}
+                                        На доработку
+                                    {% elif project.status == project.REJECT %}
+                                        Отклонена
+                                    {% elif project.status == project.ON_EXAM %}
+                                        На экспертизе
+                                    {% elif project.status == project.WIN %}
+                                        Победитель конкурса
+                                    {% elif project.status == project.NOT_WIN %}
+                                        Проект, не получивший поддержку
+                                    {% endif %}
+
+
+                                </td>
+                            </tr>
+                            {% if project.status == project.WIN or project.status == project.NOT_WIN %}
+                            <tr>
+                                <td>Рейтинг заявки:</td>
+                                <td> {{ project.averange_score }} </td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td>Направление:</td>
+                                <td>
+                                    {% if project.direction.title %}
+                                        {{ project.direction.title }}
+                                    {% else %}
+                                        Не выбрано
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Стоимость проекта:</td>
+                                <td>
+                                    {% if project.budget_sum %}
+                                        {{ project.budget_sum }}
+                                    {% else %}
+                                        Не заполнено
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Запрашиваемая сумма:</td>
+                                <td>
+                                    {% if project.budget_request_sum %}
+                                        {{ project.budget_request_sum }}
+                                    {% else %}
+                                        Не заполнено
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>1 О проекте:</td>
+                                <td>Заполнено на {{ project.about_percent }}%</td>
+                            </tr>
+                            <tr>
+                                <td>2 Руководитель:</td>
+                                <td>Заполнено на {{ project.manager_percent }}%</td>
+                            </tr>
+                            <tr>
+                                <td>3 Команда:</td>
+                                <td>Заполнено на {{ project.members_percent }}%</td>
+                            </tr>
+                            <tr>
+                                <td>4 Организация:</td>
+                                <td>Заполнено на {{ project.organization_percent }}%</td>
+                            </tr>
+                            <tr>
+                                <td>5 Календарный план:</td>
+                                <td>{{ project.events_count }}</td>
+                            </tr>
+                            <tr>
+                                <td>6 Бюджет:</td>
+                                <td>{{ project.cost_count }}</td>
+                            </tr>
+                            <tr>
+                                <td>7 Форма подтверждения подачи заявки:</td>
+                                <td>
+                                    {% if project.request_file %}
+                                        <a href="/media/{{ project.request_file.name }}">
+                                            загружена
+                                        </a>
+                                    {% else %}
+                                        не загружена
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                        </table>
+                    </li>
+                </ul>
+            </div>
+            <div :class="showSidebar ? 'col-sm-9' : 'col-sm-12'">
+                {% if request.user|has_group:"expert" or request.user|has_group:"admin" or request.user|has_group:"admin2" or project.status == project.FIX %}
+                    {% include "user/view-project/subtab-organization-checklist.html" %}
+                {% endif %}
+                <tabs :showsave="false" default="project" @change="tabChanged">
+                    <tab id="project" name="О проекте">
+                        {% include "user/view-project/tab-project.html" %}
+                    </tab>
+                    <tab id="manager" name="Руководитель проекта">
+                        {% include "user/view-project/tab-manager.html" %}
+                    </tab>
+                    <tab id="members" name="Команда проекта">
+                        {% include "user/view-project/tab-members.html" %}
+                    </tab>
+                    <tab id="organization" name="Организация-заявитель">
+                        {% include "user/view-project/tab-organization.html" %}
+                    </tab>
+                    <tab id="plan" name="Календарный план">
+                        {% include "user/view-project/tab-plan.html" %}
+                    </tab>
+                    <tab id="budget" name="Бюджет">
+                        {% include "user/view-project/tab-budget.html" %}
+                    </tab>
+                    <tab id="finish" name="Подать заявку">
+                        {% include "user/view-project/tab-finish.html" %}
+                    </tab>
+                </tabs>
+            </div>
+        </div>
+        {% if request.user|has_group:"expert" %}
+            <h4>Статус экспертизы: {% if score_sheet.status == score_sheet.NEW %} На экспертизе {% else %} Экспертиза
+                завершена {% endif %}</h4>
+            {% if score_sheet.status == score_sheet.NEW %}
+                {% if score_sheet.contest.status == score_sheet.contest.ON_EXAM %}
+                    {% include 'expert/_score-sheet-form.html' %}
+                {% endif %}
+            {% else %}
+                {% include 'expert/_score-sheet-view.html' %}
+            {% endif %}
+        {% endif %}
+
+        {% if project.status == project.NEW or project.status == project.ON_CHECK %}
+            {% if request.user|has_group:"admin" %}
+                <div>
+                    {% include "expert/form-organization-checklist.html" %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <script src="{% static 'vue/tabs.js' %}"></script>
+    <script src="{% static 'vue/upload.js' %}"></script>
+    <script>
+
+        var app = new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data: {
+                selectedTab: 'project'
+            },
+            computed: {
+                showSidebar() {
+                    return !['plan', 'budget'].includes(this.selectedTab);
+                },
+            },
+            components: {
+                FileUpload: VueUploadComponent,
+            },
+            methods: {
+                save() {
+                },
+                tabChanged(selectedTab) {
+                    this.selectedTab = selectedTab.id;
+                }
+            }
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2">
+            {% include "profile/side.html" %}
+        </div>
+        <div class="col-sm-10">
+            <h2>Средний балл проектов</h2>
+            <table class="table table-sm">
+                <tr>
+                    <th>Конкурс</th>
+                    <th>Проект</th>
+                   
+                    <th>Оценка</th>
+                    <th>Оценка k</th>
+                    <th>Эксперт</th>
+               
+                    <th></th>
+                </tr>
+            {% for score_sheet in score_averange_list %}
+                <tr>
+                    <td>{{score_sheet.contest.title}}</td>
+                    <td>{{score_sheet.project.title}}</td>
+
+                    <td>{{score_sheet.score_sum}}</td>
+                    <td>{{score_sheet.score_total_sum}}</td>
+                    <td>{{score_sheet.author}} ({{score_sheet.author.last_name}} {{score_sheet.author.first_name}})</td>
+                    
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

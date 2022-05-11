@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+  .main_label{
+    margin-top: 3%;
+  }
+  
+  .control-label:after {
+    content:"*";
+    color:red;
+  }
+  
+  
+  .percent_font{
+   font-size: small; 
+  }
+  
+  
+  .fonts{
+    font-family: 'Open Sans', sans-serif;
+  }
+
+  .table tbody tr:hover td, .table tbody tr:hover th {
+  background-color: #569596;
+}
+  label{
+    margin-top: 10px;
+    margin-bottom: -10px;
+  }
+  
+  
+  
+  
+      </style>
+      
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+  
+      <!--fonts-->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+  
+      <!--fonts end-->
+  
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+<body class="body fonts">
+ 
+
+
+  {% csrf_token %}
+  {% verbatim %}
+    <div class="container-sm" style="margin-top: 5em;">
+
+        <div id="vue_app">
+            <p class="text-center fs-2">Раздел «Муниципальным образованиям»</p>
+         
+
+            <div class="row">
+              <div class="col-3" >
+                 
+                
+       
+                <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                  <button class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="true">Мой профиль</button>
+                  <button class="nav-link" id="v-pills-main-tab" data-bs-toggle="pill" data-bs-target="#v-pills-main" type="button" role="tab" aria-controls="v-pills-main" aria-selected="false" v-on:click="projects()">Мои проекты</button>
+                  <button class="nav-link" id="v-pills-messages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">Создать письмо</button>
+                 
+                </div>
+           
+              
+                
+ 
+              </div>
+                <div class="col-9">
+
+                <div class="tab-content" id="v-pills-tabContent">
+
+                  <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+
+                    {% endverbatim %}
+
+                    {% include "mun_obr/vue/profiles.html"%}
+        
+                    {% verbatim %}
+
+                  </div>
+
+
+
+
+
+                  <div class="tab-pane fade" id="v-pills-main" role="tabpanel" aria-labelledby="v-pills-main-tab">
+                    <!--main-->
+                    <form>
+                    
+                    <!--Список проектов-->
+                    {% endverbatim %}
+
+                    {% include "mun_obr/vue/projects_list.html"%}
+
+                    {% verbatim %}
+                    <!--Список проектов кон-->
+                    
+                    </form>
+                  
+                  <!--end main-->
+                  </div>
+
+
+                
+
+
+                  <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+                    <!--Создать письмо-->
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Заявка <p class="percent_font">Заполнено на {{percent}}%</p></button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Договор <p class="percent_font">Заполнено на {{percent_contract}}%</p></button>
+                      </li>
+                 
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                      
+                      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        
+
+                        <!--1 tab-->
+                        {% endverbatim %}
+
+
+                        {% include "mun_obr/vue/tabs/tab1.html"%}
+
+                        {% verbatim %}
+                        <!--1 tab end-->
+
+                       
+                      </div>
+                      <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <!--2 tab-->
+                        {% endverbatim %}
+
+                        {% include "mun_obr/vue/tabs/tab2.html"%}
+
+                        {% verbatim %}
+
+                        <!--2 tab end-->
+                      </div>
+                
+                    </div>
+                  </div>
+
+
+                  <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">...</div>
+                </div>
+
+
+            
+                
+                
+                </div>
+    
+            </div>
+  
+    </div><!--vue_app-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+   
+    <div style="margin-top: 5em;"></div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="http://127.0.0.1:8000/static/js/mun_obr/script.js"></script>
+
+ 
+
+
+    {% endverbatim %}
+
+    {% endblock %}
+

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    {% load crispy_forms_tags %}
+    <style>
+    .linkSpanner {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+    </style>
+    <div class="container pt-4 pt-md-5">
+        <h1 class="mb-4 ">
+            Contur
+        </h1>
+        <div class="row">
+            <div class="col-12">
+                <a id="btn1" href="{% url 'contur-api-req' %}" class="btn btn-primary">API</a>
+                <input id="ogrn" type="text" value="1121435003128"/>
+                <pre id="el_response1" class="mt-4">123</pre>
+            </div>
+        </div>
+        <div class="row d-none">
+            <div class="col-md-9">
+                {% for org in organizations %}
+                    <div class="card mb-4">
+                        <div class="card-body row">
+                            <div class="col-sm-7">
+                                <h3 class="card-title">{{ org.short_name }}</h3>
+                                <p class="text-secondary">{{ org.full_name }}</p>
+                            </div>
+                            <div class="col-sm-5">
+                                {% comment %} <h3 class="card-text text-muted h6"># {{ org.id }}
+                                    {{ org.registration_date|date:"d E Y" }}
+                                </h3> {% endcomment %}
+                                <div class="">
+                                    <b>ИНН:</b> {{ org.inn }}
+                                </div>
+                                <div class="">
+                                    <b>ОГРН:</b> {{ org.ogrn }}
+                                </div>
+                                <div class="">
+                                    <b>КПП:</b> {{ org.kpp }}
+                                </div>
+                            </div>
+                        </div>
+                        {% comment %} <a href="{% url 'project-view' project.id %}">
+                            <span class="linkSpanner"></span>
+                        </a> {% endcomment %}
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/contur/script.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,96 @@
+<style>
+    .project-card {
+        cursor: pointer;
+    }
+
+    .linkSpanner {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+
+    .filter-btn-bar {
+        text-align: center;
+    }
+
+</style>
+{% extends "base.html" %}
+{% block content %}
+    {% load crispy_forms_tags %}
+
+    <div class="container">
+        <h2>Витрина лучших проектов</h2>
+        <br><br>
+        <div class="row">
+            <div class="col-sm-9">
+                {% if not projects %}
+                    <h4>На данный момент пока нет проектов в этом разделе</h4>
+                {% endif %}
+                {% for project in projects %}
+                    <div class="card mb-4 project-card">
+                        <div class="card-body row">
+                            <div class="col-sm-7">
+                                <h3 class="card-title">{{ project.title }}</h3>
+                                <p>{{ project.contest.title }}</p>
+                                <p>{{ project.direction.title }}</p>
+                            </div>
+                            <div class="col-sm-5">
+                                <h3 class="card-title">{{ project.budget_sum }} ₽</h3>
+                                <p class="card-text text-muted h6">Расходы на реализацию</p>
+                                <p class="card-text text-muted h3">{{ project.budget_request_sum }} ₽ </p>
+                                {{ project.get_status_display }}
+                                <h3 class="card-text text-muted h6">Заявка {{ project.id }}
+                                    от {{ project.created_on }} </h3>
+                            </div>
+                        </div>
+                        <a href="{% url 'project-view' project.id %}">
+                            <span class="linkSpanner"></span>
+                        </a>
+                    </div>
+                {% endfor %}
+                {% include '_pager.html' with page_obj=projects %}
+            </div>
+            <div class="col-sm-3">
+
+                <form class="form-group filter" action="" method="get">
+                    <div>
+                        <h6>ИНН организации</h6>
+                        {{ filter.form.organization__inn|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>ОГРН организации</h6>
+                        {{ filter.form.organization__ogrn|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>Название организации</h6>
+                        {{ filter.form.organization__short_name|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>№ Проекта</h6>
+                        {{ filter.form.id|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>Название проекта</h6>
+                        {{ filter.form.title|as_crispy_field }}
+                    </div>
+
+                    <div>
+                        <h6>Грантовое направление</h6>
+                        {{ filter.form.direction|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>Конкурс</h6>
+                        {{ filter.form.contest|as_crispy_field }}
+                    </div>
+                    <div class="filter-btn-bar">
+                        <input type="submit" value="Применить" class="btn filter-btn materials-btn"/>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

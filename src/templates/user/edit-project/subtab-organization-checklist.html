@@ -1,0 +1,12 @@
+
+
+<div v-if="project.organization.checklist && project.organization.checklist.length">
+  <p></p>
+  <h4>Замечания</h4>
+  <template v-for="x in (project.organization.checklist || []).filter(s=>s.value == false)">
+    <div class="alert alert-warning" :key="'checklist-'+x.id">
+      <strong>#[[x.id]] </strong> [[x.message]] <span v-if="x.comment"> - [[x.comment]]</span>
+    </div>
+  </template>
+</div>
+

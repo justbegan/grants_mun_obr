@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load django_tables2 %}
+{% block content %}
+    {% load crispy_forms_tags %}
+    {% load render_table from django_tables2 %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                {% include "profile/side.html" %}
+            </div>
+            <div class="col-sm-10">
+                <h2>Все оценочные листы</h2>
+                <form class="form-group" action="" method="get">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            {{ filter.form.contest|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-3">
+                            {{ filter.form.project__direction|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-3">
+                            {{ filter.form.status|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-3">
+                            {{ filter.form.project_id|as_crispy_field }}
+                        </div>
+                    </div>
+                    <input type="submit" value="Применить" class="btn btn-primary btn-sm align-bottom"/>
+                </form>
+                <div class="text-right">
+                    <a href="{% export_url "xlsx" %}" class="btn btn-outline-primary btn-circle mb-2">
+                        Загрузить  <code>Excel</code>
+                    </a>
+                </div>
+                {% render_table score_sheet_table 'django_tables2/bootstrap4.html' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

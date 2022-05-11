@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+{% load auth_extras %}
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2">
+            {% include "profile/side.html" %}
+        </div>
+
+        <div  class="col-sm-10">
+            <div class="row">
+                <div class="col-md-9">
+                    <h2>Мои проекты</h2>
+                    <p class="text-info">Внимание! По каждому направлению может быть создана только одна заявка</p>
+                </div>
+                <div class="col-md-3">
+                {% if contest and contest.status == contest.OPENED or contest.status == contest.TECH_WORK %}
+                    <a href="{% url 'user-create-project' contest.id %}" class="btn btn-primary" role="button">Создать заявку</a>
+                {% endif %}
+
+                </div>
+            </div>
+
+            <form class="form-group" action="" method="get" >
+            <div class="row">
+                <div class="col-sm-3">
+                    {{ filter.form.contest|as_crispy_field }}
+                </div>
+                <div class="col-sm-3">
+                    {{ filter.form.status|as_crispy_field }}
+                </div>
+                <div class="col-sm-3 align-bottom">
+                
+                </div>
+            </div>
+            <input type="submit" value="Применить" class="btn btn-primary btn-sm align-bottom"/>
+            </form>
+
+            <div>
+                {% render_table project_table 'django_tables2/bootstrap4.html' %}
+            </div>
+            
+        </div>
+    </div>
+
+</div>
+{% endblock %}

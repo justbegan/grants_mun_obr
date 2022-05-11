@@ -1,0 +1,21 @@
+<table class="table table-hover table-sm">
+<tr>
+    <th>№</th>
+    <th>Решаемая задача</th>
+    <th>Мероприятие, его содержание, место проведения</th>
+    <th width="130px">Дата начала</th>
+    <th width="130px">Дата окончания</th>
+    <th>Ожидаемые результаты</th>
+</tr>
+{% for event in project.event_set.all %}
+<tr>
+    <td></td>
+    <td>{{event.job.content}}</td>
+    <td>{{event.name}}</td>
+    <td>{{event.start_date}}</td>
+    <td>{{event.finish_date}}</td>
+    <td>{{event.result}}</td>
+</tr>
+{% endfor %}
+</table>
+

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 card mb-4 mt-3 left top course-detail">
+                <div class="card-body">
+                    <h2><a href="{% url 'course' %}">Онлайн-курсы</a></h2>
+                    <h2>{% block title %} {{ object.title }} {% endblock title %}</h2>
+                    <div id="course">
+                        {{ object.html | safe }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mt-3" id="course-side">
+                <div class="card pt-3 pr-2">
+                    <ul id="course-menu"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function() {
+            'use strict';
+            const $sections = $('#course h3');
+            if ($sections.length) {
+                const $menu = $('#course-menu');
+                $sections.each(function(index, el) {
+                    const text = $(this).text();
+                    {#console.log($(this).attr('id'));#}
+                    let id;
+                    if ($(this).attr('id')) {
+                        id = $(this).attr('id');
+                    } else {
+                        id = 'section-id-' + index;
+                        $(this).attr('id', id);
+                    }
+                    $menu.append('<li><a href="#' + id + '">' + text + '</a></li>');
+                });
+                const pos = $('#course-side').position();
+                $('#course-side').css({
+                    position: 'fixed',
+                    top: pos.top,
+                    left: pos.left
+                });
+            } else {
+                $('#course-side').remove();
+            }
+
+        });
+    </script>
+
+{% endblock content %}

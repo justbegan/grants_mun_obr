@@ -1,0 +1,755 @@
+{% load static %}
+{% load filter %}
+{% load formatters %}
+{% load auth_extras %}
+<style>
+    body {
+        font-size: 12px;
+        text-align: justify;
+    }
+    .title {
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+    }
+    .table-info {
+        margin-top: 16px;
+        width: 100%;
+    }
+    .table-sign {
+        width: 100%;
+    }
+    .table-sign td {
+        width: 150px;
+        overflow: hidden;
+        display: inline-block;
+        white-space: nowrap;
+        text-align: center;
+    }
+    .box {
+        border: 1px solid black;
+        height: 40px;
+    }
+    .date-box {
+        border: 1px solid black;
+        width: 80px;
+        height: 20px;
+        padding-top: 6px;
+    }
+    .table-date td {
+        text-align: center;
+    }
+
+    table {
+        font-size: 10px;
+    }
+</style>
+<body>
+
+<div class="title">
+    ЗАЯВКА №{{project.id}} НА УЧАСТИЕ В КОНКУРСЕ НА ПРЕДОСТАВЛЕНИЕ
+    ГРАНТОВ ГЛАВЫ РЕСПУБЛИКИ САХА (ЯКУТИЯ) НА РАЗВИТИЕ ГРАЖДАНСКОГО ОБЩЕСТВА В РЕСПУБЛИКЕ САХА (ЯКУТИЯ)
+</div>
+
+<h1>О проекте</h1>
+
+<p>1. Грантовое направление, которому преимущественно соответствует планируемая деятельность по проекту:</p>
+<p>{{ project.direction.title | default:"Не выбрано" }}</p>
+
+<p>2. Название проекта, на реализацию которого запрашивается грант:</p>
+<p>{{ project.title|default:"Не заполнено" }}</p>
+
+<p>3. Краткое описание проекта (деятельности в рамках проекта):</p>
+<p>{{ project.description | default:"Не заполнено" | linebreaks }}</p>
+
+<p>4. География проекта:</p>
+{% if not project.geography_list %} <p>Не заполнено</p> {% endif %}
+<ul>
+    {% for geo in project.geography_list %}
+        <li>{{ geo }}</li>
+    {% endfor %}
+</ul>
+
+<p>5. Дата начала реализации проекта:</p>
+<p>{{ project.start_date|default:"Не заполнено" }}</p>
+
+<p>6. Дата окончания реализации проекта:</p>
+<p>{{ project.finish_date|default:"Не заполнено" }}</p>
+
+<p>7. Обоснование социальной значимости проекта:</p>
+<p>{{ project.social_significance|default:"Не заполнено" }}</p>
+
+<p>7.1. Полное описание проекта, презентация проекта:</p>
+{% if not project.presentation_files %} <p>Не загружено</p> {% endif %}
+<ul>
+    {% for presentation_file in project.presentation_files %}
+        <li><a href="/media/{{presentation_file.file }}">{{ presentation_file.file }}</a></li>
+    {% endfor %}
+</ul>
+
+<p>8. Целевые группы проекта:</p>
+{% if not project.target_groups %} <p>Не заполнено</p> {% endif %}
+<ul>
+    {% for group in project.target_groups %}
+        <li>{{ group.title }}</li>
+    {% endfor %}
+</ul>
+
+<p>9. Цель проекта:</p>
+<ul>
+    {% for goal in project.goal_set.all %}
+        <li>{{ goal.content }}</li>
+    {% endfor %}
+</ul>
+
+<p>10. Задачи проекта:</p>
+<ul>
+    {% for job in project.job_set.all %}
+        <li>{{ job.content }}</li>
+    {% endfor %}
+</ul>
+
+<p>11. Партнёры проекта:</p>
+{% if not project.partner_set.all %} <p>Не заполнено</p> {% endif %}
+<ul>
+    {% for partner in project.partner_set.all %}
+        <li>
+            {{ partner.name }} ({{partner.supports}})
+        </li>
+    {% endfor %}
+</ul>
+
+<p>11.1. Письма поддержки, соглашения о сотрудничестве и иные аналогичные документы:</p>
+{% if not project.letter_files %} <p>Не загружено</p> {% endif %}
+<ul>
+    {% for letter_file in project.letter_files %}
+        <li><a href="/media/{{letter_file.file }}">{{ letter_file.file }}</a></li>
+    {% endfor %}
+</ul>
+
+<p>12. Как будет организовано информационное сопровождение проекта:</p>
+<p>{{ project.info_support|default:"Не заполнено" }}</p>
+
+<p>13. Количественные результаты:</p>
+{% if not project.quantresult_set.all %} <p>Не заполнено</p> {% endif %}
+{% for result in project.quantresult_set.all %}
+    <ul>
+        <li>{{ result.name }} {{ result.count }}</li>
+    </ul>
+{% endfor %}
+
+<p>14. Качественные результаты:</p>
+<p>{{ project.quality_results|default:"Не заполнено" }}</p>
+
+<p>15. Дальнейшее развитие проекта:</p>
+<p>{{ project.further_progress|default:"Не заполнено" }}</p>
+
+<p>16. Источники ресурсного обеспечения проекта в дальнейшем:</p>
+<p>{{ project.sources|default:"Не заполнено" }}</p>
+
+<h1>Руководитель проекта</h1>
+
+<p>Должность руководителя проекта в организации-заявителе:</p>
+<p>{{project.manager.position|if_empty:"Не заполнено"}}</p>
+
+
+<p> ФИО руководителя проекта:</p>
+<p>
+    {% if project.manager.last_name and project.manager.first_name and project.manager.middle_name%}
+        {{project.manager}}
+    {% else %}
+        Не заполнено
+    {% endif %}
+</p>
+
+
+<p>Рабочий телефон:</p>
+<p>{{project.manager.work_phone|if_empty:"Не заполнено"}}</p>
+
+
+<p>Мобильный телефон:</p>
+<p>{{project.manager.mobile_phone|if_empty:"Не заполнено"}}</p>
+
+
+<p>Рабочий телефон:</p>
+<p>{{project.manager.work_phone|if_empty:"Не заполнено"}}</p>
+
+
+<p>Электронная почта:</p>
+<p>{{project.manager.email|if_empty:"Не заполнено"}}</p>
+
+
+
+<p>Образование:</p>
+<p>{{project.manager.get_education_display|if_empty:"Не заполнено"}}</p>
+
+
+
+<p>Учёное звание, учёная степень руководителя проекта (если имеется):</p>
+<p>{{project.manager.academic_rank|if_empty:"Не заполнено"}}</p>
+
+
+
+<p>Образовательные организации и специальности:</p>
+<p>
+    {% if not project.manager.educations %} Не заполнено {% endif %}
+</p>
+
+
+{% for institution in project.manager.educations %}
+
+    <p>Образовательная организация:</p>
+    <p>{{ institution.organization }}</p>
+
+
+    <p>Специальность:</p>
+    <p>{{ institution.position }}</p>
+
+
+    <p>Дата поступления:</p>
+    <p>{{ institution.start_date }}</p>
+
+
+    <p>Дата окончания:</p>
+    <p>{{ institution.finish_date }}</p>
+
+
+    <p></p>
+    <p>&nbsp;</p>
+
+{% endfor %}
+
+
+
+<p>Опыт работы:</p>
+<p>
+    {% if not project.manager.works %} Не заполнено {% endif %}
+</p>
+
+
+{% for institution in project.manager.works %}
+
+    <p>Организация:</p>
+    <p>{{ institution.organization }}</p>
+
+
+    <p>Должность:</p>
+    <p>{{ institution.position }}</p>
+
+
+    <p>Дата начала работы:</p>
+    <p>{{ institution.start_date }}</p>
+
+
+    <p>Дата окончания работы:</p>
+    <p>{{ institution.finish_date|default:"Работает по текущее время" }}</p>
+
+
+    <p></p>
+    <p>&nbsp;</p>
+
+{% endfor %}
+
+
+<p>Дополнительные сведения:</p>
+<p>{{project.manager.info|if_empty:"Не заполнено"|linebreaks}}</p>
+
+
+
+<p>Рекомендации, письма, отзывы, характеристики</p>
+<p>
+    {% if not project.manager_letter_files %} Не загружено {% endif %}
+<ul>
+    {% for letter_file in project.manager_letter_files %}
+        <li><a href="/media/{{letter_file.file }}">{{ letter_file.file }}</a></li>
+    {% endfor %}
+</ul>
+</p>
+
+
+
+<p>Дата рождения:</p>
+<p>{{project.manager.birth_date|if_empty:"Не заполнено"}}</p>
+
+
+
+<p>Фотография</p>
+<p>
+    {% if not project.manager_photo_files %} Не загружено {% endif %}
+<ul>
+    {% for letter_file in project.manager_photo_files %}
+        <img src="/media/{{letter_file.file }}" width="100%">
+    {% endfor %}
+</ul>
+</p>
+
+<p>Ссылка на профиль в социальных сетях</p>
+<p>{{project.manager.social_links|if_empty:"Не заполнено"|urlize|linebreaks}}</p>
+
+
+<h1>Команда проекта</h1>
+
+{% for member in project.projectmember_set.all %}
+
+    <p>Должность или роль в заявленном проекте:</p>
+    <p>{{member.position|if_empty:"Не заполнено"}}</p>
+
+
+    <p> ФИО члена команды:</p>
+    <p>
+        {% if member.last_name and member.first_name and member.middle_name%}
+            {{member}}
+        {% else %}
+            Не заполнено
+        {% endif %}
+    </p>
+
+
+
+    <p>Образование:</p>
+    <p>{{member.get_education_display|if_empty:"Не заполнено"}}</p>
+
+
+
+    <p>Образовательные организации и специальности:</p>
+    <p>
+        {% if not member.educations %} Не заполнено {% endif %}
+    </p>
+
+    {% for institution in member.educations %}
+
+        <p>Образовательная организация:</p>
+        <p>{{ institution.organization }}</p>
+
+
+        <p>Специальность:</p>
+        <p>{{ institution.position }}</p>
+
+
+        <p>Дата поступления:</p>
+        <p>{{ institution.start_date }}</p>
+
+
+        <p>Дата окончания:</p>
+        <p>{{ institution.finish_date }}</p>
+
+
+        <p></p>
+        <p>&nbsp;</p>
+
+    {% endfor %}
+
+
+
+    <p>Опыт работы:</p>
+    <p>
+        {% if not member.works %} Не заполнено {% endif %}
+    </p>
+
+
+    {% for institution in member.works %}
+
+        <p>Организация:</p>
+        <p>{{ institution.organization }}</p>
+
+
+        <p>Должность:</p>
+        <p>{{ institution.position }}</p>
+
+
+        <p>Дата начала работы:</p>
+        <p>{{ institution.start_date }}</p>
+
+
+        <p>Дата окончания работы:</p>
+        <p>{{ institution.finish_date|default:"Работает по текущее время" }}</p>
+
+
+        <p></p>
+        <p>&nbsp;</p>
+
+    {% endfor %}
+
+
+    <p>Дополнительные сведения:</p>
+    <p>{{member.info|if_empty:"Не заполнено"}}</p>
+
+    <hr style="border-top: 2px solid black;">
+{% endfor %}
+
+
+<h1>Организация-заявитель</h1>
+
+
+<p>1. ОГРН:</p>
+<p>{{ project.organization.ogrn|if_empty:"Не заполнено" }}</p>
+
+
+<p>2. ИНН:</p>
+<p>{{ project.organization.inn|if_empty:"Не заполнено" }}</p>
+
+
+<p>3. КПП:</p>
+<p>{{ project.organization.kpp|if_empty:"Не заполнено" }}</p>
+
+
+<p>4 Сведения из ЕГРЮЛ</p>
+<p>
+    {% if not project.organization_egrul_files %} Не загружено {% endif %}
+<ul>
+    {% for file in project.organization_egrul_files %}
+        <li><a href="/media/{{file.file }}">{{ file.file }}</a></li>
+    {% endfor %}
+</ul>
+</p>
+
+<p>5. Полное наименование организации:</p>
+<p>{{ project.organization.full_name|if_empty:"Не заполнено" }}</p>
+
+
+<p>6. Сокращенное наименование организации:</p>
+<p>{{ project.organization.short_name|if_empty:"Не заполнено" }}</p>
+
+
+<p>6.1 Файл устава</p>
+<p>
+    {% if not project.organization_ustav_files %} Не загружено {% endif %}
+<ul>
+    {% for file in project.organization_ustav_files %}
+        <li><a href="/media/{{file.file }}">{{ file.file }}</a></li>
+    {% endfor %}
+</ul>
+</p>
+
+
+<p>6.2. Дата регистрации организации: </p>
+<p>{{ project.organization.registration_date|if_empty:"Не заполнено" }}</p>
+
+
+<p>6.3. Наименование муниципального района/городского округа организации</p>
+<p>
+    {% if not project.organization.geography_set.all %} Не заполнено {% endif %}
+<ul>
+    {% for geo in project.organization.geography_set.all %}
+        <li>{{ geo }}</li>
+    {% endfor %}
+</ul>
+</p>
+
+
+<p>7. Адрес (место нахождения) организации </p>
+<p>{{ project.organization.address|if_empty:"Не заполнено" }}</p>
+
+<p>8. Адрес для направления организации юридически значимых сообщений </p>
+<p>{{ project.organization.legal_address|if_empty:"Не заполнено" }}</p>
+
+
+<p>9. Основные виды деятельности организации </p>
+<p>
+    {% if not project.organization.main_activities %} Не заполнено {% endif %}
+<ul>
+    {% for item in project.organization.main_activities %}
+        <li>{{ item.content }}</li>
+    {% endfor %}
+</ul>
+</p>
+
+
+<p>10. Дополнительные документы об организации</p>
+<p>
+    {% if not project.organization_etc_files %} Не загружено {% endif %}
+<ul>
+    {% for file in project.organization_etc_files %}
+        <li><a href="/media/{{file.file }}">{{ file.file }}</a></li>
+    {% endfor %}
+</ul>
+</p>
+
+
+<p>11. Целевые группы, опыт работы с которыми имеет организация:</p>
+<p>
+    {% if not project.organization_target_groups %} Не заполнено {% endif %}
+<ul>
+    {% for group in project.organization_target_groups %}
+        <li>{{ group.title }}</li>
+    {% endfor %}
+</ul>
+</p>
+
+
+<p>12. Контактный телефон организации</p>
+<p>{{ project.organization.phone|if_empty:"Не заполнено" }}</p>
+
+
+<p>13. Адрес электронной почты для направления организации юридически значимых сообщений</p>
+<p>{{ project.organization.legal_email|if_empty:"Не заполнено" }}</p>
+
+
+<p>13.1. Веб-сайт</p>
+<p>{{ project.organization.web|if_empty:"Не заполнено"|urlize  }}</p>
+
+
+<p>13.2. Группы в соц. сетях</p>
+<p>{{ project.organization.social|if_empty:"Не заполнено"|urlize|linebreaks }}</p>
+
+
+<p>14. ФИО руководителя организации</p>
+<p>{{ project.organization.manager_fio|if_empty:"Не заполнено" }}</p>
+
+
+<p>14.1. Должность руководителя организации</p>
+<p>{{ project.organization.manager_position|if_empty:"Не заполнено" }}</p>
+
+
+<p>15. Лица, имеющие право подписи без доверенности: </p>
+<p>
+    {% if not project.organization.trusted_persons %} Не заполнено {% endif %}
+<ul>
+    {% for item in project.organization.trusted_persons %}
+        <li>{{ item.content }}</li>
+    {% endfor %}
+</ul>
+</p>
+
+
+<p>16. Количество членов (участников) организации: физических лиц, юридических лиц</p>
+<p>{{ project.organization.members_count|if_empty:"Не заполнено" }}</p>
+
+
+<p>17. Количество штатных работников</p>
+<p>{{ project.organization.employees_count|if_empty:"Не заполнено" }}</p>
+
+
+<p>18. Количество добровольцев</p>
+<p>{{ project.organization.volunteers_count|if_empty:"Не заполнено" }}</p>
+
+
+<p>19. Доходы организации за предыдущий год:</p>
+<p></p>
+
+
+<p> президентские гранты</p>
+<p>{{ project.organization.presidential_grants }}</p>
+
+
+<p>гранты, взносы, пожертвования российских некоммерческих организаций (исключая президентские гранты)</p>
+<p>{{ project.organization.non_commercial_grants }}</p>
+
+
+<p> взносы, пожертвования российских коммерческих организаций</p>
+<p>{{ project.organization.commercial_grants}}</p>
+
+
+<p> вступительные, членские и иные взносы, пожертвования российских граждан</p>
+<p>{{ project.organization.membership_fee }}</p>
+
+
+<p> гранты, взносы, пожертвования иностранных организаций и иностранных граждан</p>
+<p>{{ project.organization.foreign_grants }}</p>
+
+
+<p> средства, полученные из федерального бюджета</p>
+<p>{{ project.organization.federal_budget }}</p>
+
+
+<p> средства, полученные из бюджетов субъектов Российской Федерации</p>
+<p>{{ project.organization.region_budget}}</p>
+
+
+<p> средства, полученные из местных бюджетов</p>
+<p>{{ project.organization.local_budget}}</p>
+
+
+<p> доходы (выручка) от реализации товаров, работ, услуг, имущественных прав</p>
+<p>{{ project.organization.revenue}}</p>
+
+
+<p>внереализационные доходы (дивиденды, проценты по депозитам и т.п.) </p>
+<p>{{ project.organization.dividends}}</p>
+
+
+<p> прочие доходы</p>
+<p>{{ project.organization.other_income }}</p>
+
+
+<p> 20. Общая сумма расходов организации за предыдущий год</p>
+<p>{{ project.organization.total_cost|if_empty:"Не заполнено" }}</p>
+
+
+<p>21. Количество благополучателей за предыдущий год (с января по декабрь): физические лица, юридические лица:</p>
+<p>{{ project.organization.beneficiaries_count|if_empty:"Не заполнено" }}</p>
+
+
+<p>22. Основные реализованные проекты и программы за последние 5 лет:</p>
+<p>
+    {% if not project.organization.success_projects %} Не заполнено {% endif %}
+</p>
+
+{% for item in project.organization.success_projects %}
+
+    <p>Дата начала</p>
+    <p>{{ item.start_date  }}</p>
+
+
+    <p>Дата окончания</p>
+    <p>{{ item.finish_date }}</p>
+
+
+    <p>Название проекта</p>
+    <p>{{ item.name }}</p>
+
+
+    <p>Объем финансирования:</p>
+    <p>{{ item.finance|floatformat:2 }}</p>
+
+
+    <p>Источники финансирования:</p>
+    <p>{{ item.finance_source }}</p>
+
+
+    <p>Основные результаты:</p>
+    <p>{{ item.results|linebreaks }}</p>
+
+{% endfor %}
+
+
+<p>23. Имеющиеся в распоряжении организации материально-технические ресурсы:</p>
+<p>
+
+</p>
+
+
+<p>Недвижимость:</p>
+<p>
+    {{ project.organization.material_resources.resource|if_empty:"Не заполнено"|linebreaks }}
+</p>
+
+
+<p>Оборудование:</p>
+<p>
+    {{ project.organization.material_resources.equipment|if_empty:"Не заполнено"|linebreaks }}
+</p>
+
+
+<p>Другое:</p>
+<p>
+    {{ project.organization.material_resources.other|if_empty:"Не заполнено"|linebreaks }}
+</p>
+
+<p>24. Публикации в СМИ</p>
+<p>{{ project.organization.media_publications|if_empty:"Не заполнено"|linebreaks }}</p>
+
+
+<h1>Календарный план</h1>
+
+<table>
+    <tbody>
+        <tr>
+            <th>№</th>
+            <th>Решаемая задача</th>
+            <th>Мероприятие, его содержание, место проведения</th>
+            <th>Дата начала</th>
+            <th>Дата окончания</th>
+            <th>Ожидаемые результаты</th>
+        </tr>
+        {% for event in project.event_set.all %}
+            <tr>
+                <td></td>
+                <td>{{event.job.content}}</td>
+                <td>{{event.name}}</td>
+                <td>{{event.start_date}}</td>
+                <td>{{event.finish_date}}</td>
+                <td>{{event.result}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+<h1>Бюджет</h1>
+
+{% for type in budget_types %}
+    <div class="row" style="background: rgb(235, 246, 254); padding: 8px;">
+        <h5>{{ budget_type|get_item:type }}</h5>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">Статья</th>
+            <th scope="col">Сумма</th>
+            <th scope="col">Количество ед.</th>
+            <th scope="col">Общая стоимость</th>
+            <th scope="col">Софинансирование</th>
+            <th scope="col">Запрашиваемая сумма</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        {% for item in project.genericcost_set.all|in_type:type %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.cost }}</td>
+                <td>{{ item.items_count }}</td>
+                <td>{{ item.total }}</td>
+                <td>{{ item.co_financing }}</td>
+                <td>{{ item.request_total }}</td>
+                <td>
+
+                </td>
+            </tr>
+
+            <tr >
+                <td colspan="7">Комментарий: {{ item.comment }} </td>
+            </tr>
+        {% endfor %}
+
+        <tr>
+            <td></td>
+            <td></td>
+            <th>ИТОГО</th>
+            <th> {% call_method project 'budget_sum_by_type' type %}</th>
+            <th> {% call_method project 'budget_co_financing_sum_by_type' type %}</th>
+            <th> {% call_method project 'budget_request_sum_by_type' type %}</th>
+            <th></th>
+        </tr>
+        </tbody>
+
+    </table>
+    <hr><br>
+{% endfor %}
+
+<table class="table table-hover table-sm">
+    <thead>
+    <tr>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col">Общая сумма расходов на реализацию проекта</th>
+        <th scope="col">Софинансирование</th>
+        <th scope="col">Запрашиваемая сумма</th>
+        <th></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr>
+        <td></td>
+        <td></td>
+        <th>ИТОГО</th>
+        <th>{{ project.budget_sum }}</th>
+        <th>{{ project.budget_co_financing_sum }}</th>
+        <th>{{ project.budget_request_sum }}</th>
+        <th></th>
+    </tr>
+    </tbody>
+
+</table>
+
+
+<p>Софинансирование: {{ project.co_finance_percent }}%</p>
+
+
+</body>

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<style>
+.big-title {
+ font-size: 5.5rem !important;
+}
+.big-links a {
+ font-size:2rem;
+}
+.i-materials-title {
+    text-shadow: 0 0 20px black;
+}
+.i-materials-title {
+    text-shadow: 0 0 20px black;
+}
+</style>
+
+<div class="index">
+    <div class="i-materials text-center text-md-left">
+        <div class="container">
+            <h1 class="i-materials-title big-title d-none d-md-block">Конкурсы</h1>
+            <h1 class="i-materials-title d-md-none text-center">Конкурсы</h1>
+            <div class="i-materials-links big-links d-none d-md-block">
+                <a href="{% url 'documents' %}" class="btn btn-link text-light d-block d-md-inline" role="button">Конкурсная документация</a>
+                <a href="{% url 'page' 'expertise'%}" class="btn btn-link text-light d-block d-md-inline" role="button">Как проходит экспертиза</a>
+                <a href="{% url 'page' 'how-to-apply'%}" class="btn btn-link text-light d-block d-md-inline" role="button">Как подать заявку</a>
+                <a href="{% url 'page' 'Postanovka_IOPU'%}" class="btn btn-link text-light d-block d-md-inline" role="button">Постановка в реестр СО НКО-исполнителей общественно полезных услуг</a>
+                <a href="{% url 'commission' %}" class="btn btn-link text-light d-block d-md-inline" role="button">Координационная комиссия</a>
+            </div>
+
+            <div class="i-materials-links d-md-none text-center">
+                <a href="{% url 'documents' %}" class="btn btn-link text-light d-block d-md-inline" role="button">Конкурсная документация</a>
+                <a href="{% url 'page' 'expertise'%}" class="btn btn-link text-light d-block d-md-inline" role="button">Как проходит экспертиза</a>
+                <a href="{% url 'page' 'how-to-apply'%}" class="btn btn-link text-light d-block d-md-inline" role="button">Как подать заявку</a>
+                <a href="{% url 'page' 'Postanovka_IOPU'%}" class="btn btn-link text-light d-block d-md-inline" role="button">Постановка в реестр СО НКО-исполнителей общественно полезных услуг</a>
+                <a href="{% url 'commission' %}" class="btn btn-link text-light d-block d-md-inline" role="button">Координационная комиссия</a>
+            </div>
+            <hr class="bg-light d-none d-md-block">
+        </div>
+    </div>
+
+    <div class="i-contest">
+        <div class="container py-4 text-center text-md-left">
+        {% if contest %}
+            {% if contest.status == contest.OPENED %}
+                <a href="{% url 'user-home' %}" class="btn btn-outline-light d-none d-md-block float-right mt-3" role="button">Подать заявку</a>
+            {% endif %}
+            <p class="h1 d-none d-md-block font-weight-bold">{{ contest.title }}</p>
+            <p class="h3 d-block d-md-none font-weight-bold">{{ contest.title }}</p>
+            <div>{{ contest.get_status_display }}</div>
+            {% if contest.status == contest.OPENED %}
+                <a href="{% url 'user-home' %}" class="btn btn-outline-light d-block d-md-none mt-3" role="button">Подать заявку</a>
+            {% endif %}
+            {% else %}
+            <p class="h3 d-none d-md-block font-weight-bold">Прием заявок закрыт</p>
+        {% endif %}
+        </div>
+    </div>
+
+    <div class="i-directions pt-4 pt-md-5">
+        <div class="container" id="directions">
+            <h2 class="mb-4 d-none d-md-block">
+                Гранты предоставляются социально ориентированным некоммерческим организациям по следующим направлениям:
+            </h2>
+            <h3 class="mb-4 d-block d-md-none text-center">
+                Гранты предоставляются социально ориентированным некоммерческим организациям по следующим направлениям:
+            </h3>
+            <div class="d-flex flex-wrap">
+                {% for direction in directions %}
+                    <div class="card text-center py-3 mb-4 mx-auto" style="width: 270px; height: 300px">
+                        <a class="text-dark" href="{% url 'direction-details' direction.slug %}">
+                            <img width="116" class="mx-auto" src="/media/{{ direction.img }}">
+                            <div class="card-body">{{ direction.title|truncatechars:110 }}</div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="i-documents pt-4 pt-md-5">
+        <div class="container">
+            <h2 class="mb-4 d-none d-md-block">
+                Документы
+            </h2>
+            <h3 class="mb-4 d-block d-md-none text-center">
+                Документы
+            </h3>
+            {% for doc in docs %}
+                <div class="row i-documents-item mt-4">
+                    <div class="i-document-file col-2 col-md-1">
+                        <i class="fas fa-file fa-3x pr-3"></i>
+                    </div>
+                    <div class="i-document-file col-10 col-md-4">
+                        <div class="text-break">{{ doc.file }}</div>
+                        <a href="{{ doc.file.url }}" class="btn btn-link text-left">Скачать</a>
+                    </div>
+                    <div class="i-document-title col-md-7 text-muted text-md-right">{{ doc.title }}</div>
+                </div>
+            {% endfor %}
+            <hr>
+        </div>
+    </div>
+
+    {% include "news/block.html" %}
+</div>
+
+<script src="{% static 'js/jquery/jquery.bgswitcher.js' %}"></script>
+<script>
+$('.i-materials').bgswitcher({
+    images: [
+        '/static/images/index-bg1.jpg',
+        '/static/images/index-bg2.jpg',
+        '/static/images/index-bg3.jpg',
+        '/static/images/index-bg4.jpg',
+        '/static/images/index-bg5.jpg'
+    ],
+    effect: 'drop',
+    duration: 500
+})
+</script>
+
+{%endblock%}

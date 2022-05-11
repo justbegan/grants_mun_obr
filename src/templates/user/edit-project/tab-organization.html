@@ -1,0 +1,269 @@
+{% load auth_extras %}
+<span class="alert-warning">Введие ОГРН и нажмите на кнопку АВТОЗАПОЛНЕНИЕ для автоматического заполнения основных данных организации</span>
+<div class="form-group row mt-3">
+    <div class="col-sm-6">
+        <oneinput :required="true" validator="length" mask="#############" label="1. ОГРН"
+                  v-model="project.organization.ogrn" max=13 description="">
+        </oneinput>
+    </div>
+    <div class="col-sm-6">
+        <div class="text-left">
+            <a class="btn btn-primary text-white" @click="organizationAutofill">АВТОЗАПОЛНЕНИЕ</a>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <hr>
+    </div>
+
+    <div class="col-sm-4">
+        <oneinput :readonly="true"  validator="length" mask="############" :required="true" label="2. ИНН"
+                  v-model="project.organization.inn" max=10 max2=12 description="">
+        </oneinput>
+    </div>
+    <div class="col-sm-4">
+        <oneinput :required="true" :readonly="true" validator="length" mask="#########" label="3. КПП" v-model="project.organization.kpp"
+                  max=9 description=""></oneinput>
+    </div>
+</div>
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        4. Сведения из ЕГРЮЛ в формате PDF (Обязательно поле, файл не должет быть больше 50МБ)
+    </label>
+    <div class="col-sm-8">
+        <upload max-items=1 type="organization_egrul" project_id="{{ project_id|cut:" " }}" :csrf_token="csrf_token"></upload>
+    </div>
+</div>
+
+{% if project.contest.id == 1 %}
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        4.1. Копия свидетельства о государственной регистрации в формате PDF (Обязательно поле, файл не должет быть больше 50МБ)
+    </label>
+    <div class="col-sm-8">
+        <upload type="organization_sogr" project_id="{{ project_id|cut:" " }}" :csrf_token="csrf_token"></upload>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        5. Копия справки с налоговой об отсутствии задолженности в формате PDF (Обязательно поле, файл не должет быть больше 50МБ)
+    </label>
+    <div class="col-sm-8">
+        <upload type="organization_nalog" project_id="{{ project_id|cut:" " }}" :csrf_token="csrf_token"></upload>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        5.1. Копия справки с Минюста в формате PDF (Обязательно поле, файл не должет быть больше 50МБ)
+    </label>
+    <div class="col-sm-8">
+        <upload type="organization_minust" project_id="{{ project_id|cut:" " }}" :csrf_token="csrf_token"></upload>
+    </div>
+</div>
+
+{% endif %}
+
+<oneinput :required="true" :readonly="true" label="5. Полное наименование организации" v-model="project.organization.full_name" max=300
+          description="">
+</oneinput>
+<oneinput :readonly="true" :required="true" label="6. Сокращенное наименование организации" v-model="project.organization.short_name"
+          max=300 description="">
+</oneinput>
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        6.1 Файл устава в формате PDF (Обязательно поле, файл не должет быть больше 50МБ)
+    </label>
+    <div class="col-sm-8">
+        <upload max-items=1 type="organization_ustav" project_id="{{ project_id|cut:" " }}" :csrf_token="csrf_token"></upload>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        6.2. Дата регистрации организации:
+    </label>
+    <div class="col-sm-8">
+        <vuejs-datepicker disabled typeable :disabled-dates="{from: new Date()}" format="dd.MM.yyyy" class="form-control"
+                          v-model="project.organization.registration_date" :language="ru">
+        </vuejs-datepicker>
+        <small>Данное поле обязательно для заполнения.</small>
+    </div>
+</div>
+
+<geography :id="project.organization.id" type="organization" max-items=1
+           label="6.3. Наименование муниципального района/городского округа организации. Начните вводить название, и появится список. После выбора нажмите +"
+           description="">
+</geography>
+
+
+<onetext :readonly="true" label="7. Адрес (место нахождения) организации" :required="true"
+         v-model="project.organization.address" max=600
+         description="индекс, субъект РФ, населенный пункт, улица, дом, офис/квартира.">
+</onetext>
+
+{% if project.contest.id == 1 %}
+    <onetext label="8. Фактическое место нахождения организации:" :required="true"
+            v-model="project.organization.fact_address" max=600
+            description="индекс, субъект РФ, населенный пункт, улица, дом, офис/квартира.">
+    </onetext>
+{% endif %}
+
+<onetext label="8. Адрес для направления организации юридически значимых сообщений:" :required="true"
+         v-model="project.organization.legal_address" max=600
+         description="индекс, субъект РФ, населенный пункт, улица, дом, офис/квартира.">
+</onetext>
+
+<multitext label="9. Основные виды деятельности организации:" :required="true" :force-delete="true"
+           v-model="project.organization.main_activities" max-items=30 max=600 description="">
+</multitext>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        10. Дополнительные документы об организации
+        (Доверенность о назначении лица имеющего право действовать от имени участника конкурса или дополнительная информация)
+    </label>
+    <div class="col-sm-8">
+        <upload type="organization_etc" project_id="{{ project_id|cut:" " }}" :csrf_token="csrf_token"></upload>
+    </div>
+</div>
+
+<multicomplete :required="true" type="organization" :organization_id="project.organization.id"
+               label="11. Целевые группы, опыт работы с которыми имеет организация (Обязательное поле, нажмите 'добавить'):" v-model="project.target_groups"
+               max=600 description=""></multicomplete>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        12. Контактный телефон организации
+    </label>
+    <div class="col-sm-8">
+        <input placeholder="+7" v-mask="'+7 (###) #### ###'" required v-model="project.organization.phone"
+               class="form-control"></input>
+    </div>
+</div>
+
+<oneinput :required="true" label="13. Адрес электронной почты для направления организации юридически значимых сообщений"
+          type="email"
+          v-model="project.organization.legal_email" max=100 description="">
+</oneinput>
+
+<oneinput :required="true" label="13.1. Веб-сайт" v-model="project.organization.web" max=100 description="">
+</oneinput>
+
+<onetext label="13.2. Группы в соц. сетях" :required="true"
+         v-model="project.organization.social" max=600 description="">
+</onetext>
+
+<oneinput :required="true" :readonly="true" label="14. ФИО руководителя организации" v-model="project.organization.manager_fio" max=200
+          description="">
+</oneinput>
+
+<oneinput :required="true" :readonly="true" label="14.1. Должность руководителя организации"
+          v-model="project.organization.manager_position" max=100 description="">
+</oneinput>
+
+<multitext label="15. Лица, имеющие право подписи без доверенности (Обязательное поле, нажмите 'добавить'):" :rows="2" :required="true" :force-delete="true"
+           v-model="project.organization.trusted_persons" max-items=30 max=600 description="Введите ФИО">
+</multitext>
+
+<oneinput :required="true" label="16. Количество членов (участников) организации: физических лиц, юридических лиц"
+          v-model="project.organization.members_count" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="17. Количество штатных работников" v-model="project.organization.employees_count"
+          type="number" description="">
+</oneinput>
+<oneinput :required="true" label="18. Количество добровольцев" v-model="project.organization.volunteers_count"
+          type="number" description="">
+</oneinput>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label">
+        19. Доходы организации за предыдущий год:
+    </label>
+</div>
+<oneinput :required="true" label="президентские гранты (в руб.)" v-model="project.organization.presidential_grants"
+          type="number" description="">
+</oneinput>
+<oneinput :required="true"
+          label="гранты, взносы, пожертвования российских некоммерческих организаций (исключая президентские гранты) (в руб.)"
+          v-model="project.organization.non_commercial_grants" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="взносы, пожертвования российских коммерческих организаций (в руб.)"
+          v-model="project.organization.commercial_grants" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="вступительные, членские и иные взносы, пожертвования российских граждан (в руб.)"
+          v-model="project.organization.membership_fee" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="гранты, взносы, пожертвования иностранных организаций и иностранных граждан (в руб.)"
+          v-model="project.organization.foreign_grants" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="средства, полученные из федерального бюджета (в руб.)"
+          v-model="project.organization.federal_budget" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="средства, полученные из бюджетов субъектов Российской Федерации (в руб.)"
+          v-model="project.organization.region_budget" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="средства, полученные из местных бюджетов (в руб.)"
+          v-model="project.organization.local_budget" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="доходы (выручка) от реализации товаров, работ, услуг, имущественных прав (в руб.)"
+          v-model="project.organization.revenue" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="внереализационные доходы (дивиденды, проценты по депозитам и т.п.) (в руб.)"
+          v-model="project.organization.dividends" type="number" description="">
+</oneinput>
+<oneinput :required="true" label="прочие доходы (в руб.)" v-model="project.organization.other_income" type="number"
+          description="">
+</oneinput>
+<oneinput :required="true" label="20. Общая сумма расходов организации за предыдущий год (в руб.)"
+          v-model="project.organization.total_cost" type="number" description="">
+</oneinput>
+<oneinput :required="true"
+          label="21. Количество благополучателей за предыдущий год (с января по декабрь): физические лица, юридические лица:"
+          v-model="project.organization.beneficiaries_count" type="number" description="">
+</oneinput>
+
+<orgprojects></orgprojects>
+
+<resources v-model="project.organization.material_resources"></resources>
+
+<onetext label="24. Публикации в СМИ"
+         v-model="project.organization.media_publications" max=3000 description="">
+</onetext>
+
+{% if project.contest.id == 1 %}
+
+    <div class="form-group row">
+        <label class="col-sm-4 col-form-label">
+            25. Приоритетная поддержка
+        </label>
+        <div class="col-sm-8">
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" v-model="project.organization.support_type"
+                    value="" checked>
+                <label class="form-check-label" for="exampleRadios1">
+                    Не имеет
+                </label>
+            </div><br>
+            <div class="form-check">
+                <input v-model="project.organization.support_type" class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="type1">
+                <label class="form-check-label" for="exampleRadios2">
+                    Организация состоит в реестре исполнителей
+                общественно-полезных услуг Минюста
+                </label>
+            </div><br>
+            <div class="form-check">
+                <input disabled v-model="project.organization.support_type" class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="type2">
+                <label class="form-check-label" for="exampleRadios3">
+                    Организация оказывает информационную, консультационную, методическую, образовательную, экспертную и иную поддержку социально ориентированным некоммерческим организациям.
+                </label>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% if not request.user|has_group:"expert" %}
+    {% include "user/edit-project/subtab-organization-checklist.html" %}
+{% endif %}

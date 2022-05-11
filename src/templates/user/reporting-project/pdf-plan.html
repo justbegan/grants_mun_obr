@@ -1,0 +1,166 @@
+{% load static %}
+{% load filter %}
+{% load formatters %}
+{% load auth_extras %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+
+<style>
+    {% comment %}body {
+        font-size: 12px;
+        text-align: justify;
+    }
+    .title {
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .table-info {
+        margin-top: 16px;
+        width: 100%;
+    }
+    .table-sign {
+        width: 100%;
+    }
+    .table-sign td {
+        width: 150px;
+        overflow: hidden;
+        display: inline-block;
+        white-space: nowrap;
+        text-align: center;
+    }
+    .box {
+        border: 1px solid black;
+        height: 40px;
+    }
+    .date-box {
+        border: 1px solid black;
+        width: 80px;
+        height: 20px;
+        padding-top: 6px;
+    }
+    .table-date td {
+        text-align: center;
+    }
+
+    table {
+        font-size: 10px;
+        border-collapse: collapse;
+    }
+    .table-bordered th, .table-bordered td {
+        border: 1px solid black;
+        padding: 3px 5px;
+        margin: 0;
+    }
+    .text-right {
+        text-align: right;
+    }{% endcomment %}
+
+    @media print {
+        @page {
+            /*
+            size: A4{% if landscape %} landscape{% endif %};
+            */
+            {#margin: 0;#}
+        }
+        html, body {
+            {#width: 297mm;#}
+            {#width: 210mm;#}
+            {#height: 210mm;#}
+            {#height: 297mm;#}
+        }
+        /* ... the rest of the rules ... */
+    }
+    .table.table-bordered th, .table.table-bordered td {
+        border: 1px solid black !important;
+    }
+    .podpis {
+        border-bottom: 1px solid black;
+    }
+    .mt-100 {
+        margin-top: 100px;
+    }
+    .mt-40 {
+        margin-top: 40px;
+    }
+    .mb-20 {
+        margin-bottom: 20px;
+    }
+</style>
+
+<body>
+
+<p class="text-right">
+    По Соглашению о предоставлении<br>
+    из государственного бюджета Республики Саха (Якутия)<br>
+    грантов Главы Республики Саха (Якутия)<br>
+    на развитие институтов гражданского общества<br>
+    в Республике Саха (Якутия)<br>
+    от
+    {% if project.is_have_agreements %}
+        {% for a in project.get_agreements %}
+            {{ a.date|date:'d.m.Y' }} № {{ a.number }}
+        {% endfor %}
+    {% else %}
+        <span style="color: red">??.??.???? № ??</span>
+    {% endif %}
+</p>
+
+<h4 class="text-center mb-20">
+    Отчет по исполнению Календарного плана мероприятий<br>
+    реализации проекта<br>
+    «{{ project.title }}»
+</h4>
+
+<div>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td>№</td>
+                <td>Мероприятие</td>
+                <td>Дата начала</td>
+                <td>Дата завершения</td>
+                <td>Исполнение</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for event in project.reporting_events.all %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{event.name}}</td>
+                <td>{{event.start_date|date:'d.m.Y'}}</td>
+                <td>{{event.finish_date|date:'d.m.Y'}}</td>
+                <td>{{ event.fulfillment }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container mt-100">
+    <div class="row">
+        <div class="col text-center">
+            <div class="podpis"></div>
+            Наименование должности
+            руководителя СО НКО -
+            получателя гранта
+        </div>
+        <div class="col text-center">
+            <div class="podpis"></div>
+            Подпись
+        </div>
+        <div class="col text-center">
+            <div class="podpis"></div>
+            ФИО
+        </div>
+    </div>
+    <div class="row mt-40">
+        <div class="col">
+            «_____» ___________________ 20____ г.
+            <br><br>М.п.
+        </div>
+    </div>
+</div>
+
+
+</body>

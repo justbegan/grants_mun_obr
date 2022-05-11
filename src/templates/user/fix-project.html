@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<script src="{% static 'js/uuidv4.min.js' %}"></script>
+<script src="{% static 'js/vue.js' %}"></script>
+<script src="{% static 'js/vuejs-datepicker.min.js' %}"></script>
+<script src="{% static 'js/vuejs-datepicker-ru.js' %}"></script>
+
+<script src="{% static 'js/vue2-datepicker.min.js' %}"></script>
+<script src="{% static 'js/vue2-datepicker-ru.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/vue2-datepicker.css' %}">
+
+<script src="{% static 'js/vue-upload-component.js' %}"></script>
+<script src="{% static 'js/vue-js-modal.js' %}"></script>
+<script src="{% static 'js/vue-toasted.min.js' %}"></script>
+
+<script src="{% static 'js/autocomplete.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/autocomplete.css' %}" />
+
+<script src="{% static 'js/vue-tags-input.js' %}"></script>
+<script src="{% static 'js/v-mask.min.js' %}"></script>
+
+<script src="{% static 'js/VueBootstrapTypeahead.umd.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/VueBootstrapTypeahead.css' %}">
+
+<script src="{% static 'js/bootstrap-select/bootstrap-select.min.js' %}"></script>
+<script src="{% static 'js/bootstrap-select/i18n/defaults-ru_RU.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/bootstrap-select.min.css' %}">
+
+
+<style>
+    .tabs > ul {
+        margin-left: -20px;
+    }
+    .tabs >
+    ul li {
+        vertical-align: top;
+        display: inline-block;
+        padding: 8px;
+        margin-right: 1px;
+        background: #f5fafe;
+
+    }
+
+    .tabs, ul a {
+        color: black;
+    }
+
+    .is-active {
+        background: #508E96 !important;
+    }
+
+    a .is-active {
+        color: white !important;
+    }
+
+    textarea {
+        width: 100%;
+    }
+
+    option {
+        width: 100px !important;
+    }
+
+    input:required, textarea:required {
+        border: 1px solid green;
+    }
+
+    input:required:invalid, textarea:required:invalid {
+        border: 1px solid red;
+        background: rgb(252, 217, 217);
+    }
+
+    .bootstrap-select, .bootstrap-select .dropdown-menu, .bootstrap-select .dropdown-item {
+        width: 100%!important;
+    }
+
+    .bootstrap-select .dropdown-menu li .text, .filter-option-inner-inner {
+        white-space: normal;
+    }
+</style>
+<div class="container">
+    <a href="{% url 'user-home' %}">Мои проекты</a>
+    <h2>Новый проект</h2>
+    <a href="{% url 'user-view-project' project_id %}" class="materials-btn">Просмотреть</a>
+    <div id="app">
+        <tabs :save="save" v-model="disabledAutosave"  @autosave-checkbox-toggle="toggleAutosave" :disabled="saveDisabled" default="project">
+            <tab id="project" name="1. О проекте" :selected="true">
+                <div>
+                {% include "user/edit-project/tab-project.html" %}
+                </div>
+            </tab>
+            <tab id="ogranization" name="4. Организация-заявитель">
+                {% include "user/edit-project/tab-organization.html" %}
+            </tab>
+            <tab id="budget" name="6. Бюджет">
+                {% include "user/edit-project/tab-budget.html" %}
+            </tab>
+        </tabs>
+    </div>
+</div>
+<div class="clearfix"></div>
+<br>
+<br>
+
+<script src="{% static 'vue/tabs.js' %}"></script>
+<script src="{% static 'vue/forms.js' %}"></script>
+<script src="{% static 'vue/multicomplete.js' %}?v=3"></script>
+<script src="{% static 'vue/moneytable.js' %}?v=1"></script>
+<script src="{% static 'vue/upload.js' %}"></script>
+<script src="{% static 'vue/plantable.js' %}?v=1"></script>
+<script src="{% static 'vue/membertable.js' %}"></script>
+<script src="{% static 'vue/institution.js' %}"></script>
+<script src="{% static 'vue/partners.js' %}"></script>
+<script src="{% static 'vue/quantresults.js' %}"></script>
+<script src="{% static 'vue/geography.js' %}?v=1"></script>
+<script src="{% static 'vue/orgprojects.js' %}"></script>
+<script src="{% static 'vue/accountant.js' %}"></script>
+<script src="{% static 'vue/resources.js' %}"></script>
+<script src="{% static 'vue/insurancetable.js' %}?v=1"></script>
+
+<script>
+    let contest = {{ contest | safe }};
+    let directions = {{ directions | safe }};
+    let educations = {{ educations | safe }};
+    let project = {{ project | safe }};
+    let storage_key = 'project' + project.id;
+    let stored_project = localStorage.getItem(storage_key);
+    /*if (stored_project) {
+        try {
+            stored_project = JSON.parse(stored_project);
+            let project_update_on = new Date(project.update_on);
+            let stored_update_on = new Date(stored_project.update_on);
+            let stored_autosave_on = new Date(stored_project.autosave_on);
+
+            if (project_update_on <= stored_update_on && project_update_on < stored_autosave_on) {
+                project = stored_project;
+            }
+        } catch (e) {
+            localStorage.setItem(storage_key, null);
+            console.error('Ошибка при распаковке автосохраненного проекта. Ключ очищен.', e);
+        }
+    }*/
+
+    let url = "{% url 'user-save-project' project_id %}";
+    let csrf_token = "{{ csrf_token }}";
+    let url_conturapi = "{% url 'contur-api-req' %}"
+
+    Vue.use(window["vue-js-modal"].default)
+    Vue.use(Toasted)
+    Vue.use(VueMask.VueMaskPlugin)
+
+
+    let app = new Vue({
+        el: '#app',
+        delimiters: ['[[', ']]'],
+        data: {
+            contest: contest,
+            educations: educations,
+            subs: [],
+            directions: directions,
+            project: project,
+            ru: vdp_translation_ru.js,
+            csrf_token: csrf_token,
+            saveDisabled: false,
+            autosave_millis: 20000,
+            autosaveInterval: null,
+            disabledAutosave: false
+        },
+        computed: {
+        },
+        components: {
+            vuejsDatepicker,
+            DatePicker,
+            FileUpload: VueUploadComponent,
+        },
+        updated () {
+            $(subject).selectpicker('refresh')
+        },
+        created: function () {
+            //this.$set(this, 'project', this.project)
+
+            if (typeof project.direction_id !== undefined && project.direction_id !== null) {
+                this.subs = this.directions.filter(d => {
+                    return d.id === parseInt(project.direction_id)
+                })[0].subjects
+            }
+
+            // Active
+            window.addEventListener('focus', this.startAutosave);
+            // Inactive
+            window.addEventListener('blur', this.stopAutosave);
+
+            this.startAutosave();
+        },
+        methods: {
+            toggleAutosave(value) {
+              this.disabledAutosave = value
+            },
+            startAutosave() {
+                if(this.autosave_millis){
+                    this.autosaveInterval = setInterval(()=>{
+                        console.warn('autosave', new Date)
+                        this.save(true)
+                    }, this.autosave_millis)
+                }
+            },
+            stopAutosave() {
+                clearInterval(this.autosaveInterval);
+            },
+            onChangeDirection(event) {
+                this.subs = this.directions.filter(d => { return d.id === parseInt(event.target.value) })[0].subjects
+
+                if(event.target.value === '56') {
+                    // Деятельность в области культуры, искусства, содействие духовному развитию личности 2022
+                    this.$root.project.quant_results.filter(v => (v.status !== "delete")).forEach(function (item) {
+                        if (item.name === "Количество благополучателей") {
+                            item.name = "Количество граждан, вовлеченных в культурную деятельность путем поддержки и реализации творческих инициатив"
+                        }
+                    })
+                } else {
+                    this.$root.project.quant_results.filter(v => (v.status !== "delete")).forEach(function (item) {
+                        if (item.name === "Количество граждан, вовлеченных в культурную деятельность путем поддержки и реализации творческих инициатив") {
+                            item.name = "Количество благополучателей"
+                        }
+                    })
+                }
+            },
+            autosave() {
+                this.project.autosave_on = new Date().toISOString();
+                localStorage.setItem(storage_key, JSON.stringify(this.project));
+            },
+            async save(is_autosave) {
+                if (is_autosave && this.disabledAutosave)
+                    return
+                let text_saved = is_autosave ? 'Автосохранение' : 'Сохранено'
+
+                this.saveDisabled = true
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "X-CSRFToken": csrf_token
+                    },
+                    body: JSON.stringify(this.project)
+                })
+                if (response.ok) {
+                    let res = await response.json();
+                    if (res.status === "ok") {
+                        Vue.toasted.show(text_saved, { fullWidth: true, type: "success", duration: 800 })
+                        //this.project = JSON.parse(res.project);
+                        this.assignProject(this.project, JSON.parse(res.project))
+                        this.$root.autosave();
+                    }
+                } else {
+                    Vue.toasted.show('Ошибка сохранения', { fullWidth: true, type: "error", duration: 800 })
+                }
+                this.saveDisabled = false
+            },
+
+            assignList(oldProject, newProject, arrName, condCallback) {
+                for (let newIndex in newProject[arrName]) {
+                    let newItem = newProject[arrName][newIndex]
+                    const index = oldProject[arrName].findIndex(old => condCallback(old, newItem))
+                    if (index !== -1) {
+                        let oldItem = oldProject[arrName][index]
+                        oldItem.status = newItem.status
+                        Vue.set(oldItem, 'id', newItem.id)
+                        //console.log(oldItem, newItem)
+                    }
+                }
+                for (let oldIndex in oldProject[arrName]) {
+                    const index = oldProject[arrName].findIndex(old => { return (old.status === 'delete') })
+                    if (index !== -1) oldProject[arrName].splice(index, 1);
+                }
+            },
+            assignProject(oldProject, newProject) {
+                Vue.set(oldProject, 'id', newProject.id)
+                Vue.set(oldProject, 'created_on', newProject.created_on)
+                Vue.set(oldProject, 'update_on', newProject.update_on)
+                Vue.set(oldProject, 'subject_id', newProject.subject_id)
+                Vue.set(oldProject, 'title', newProject.title)
+                Vue.set(oldProject, 'description', newProject.description)
+                Vue.set(oldProject, 'start_date', newProject.start_date)
+                Vue.set(oldProject, 'finish_date', newProject.finish_date)
+                Vue.set(oldProject, 'social_significance', newProject.social_significance)
+                Vue.set(oldProject, 'info_support', newProject.info_support)
+                Vue.set(oldProject, 'quality_results', newProject.quality_results)
+                Vue.set(oldProject, 'further_progress', newProject.further_progress)
+                Vue.set(oldProject, 'sources', newProject.sources)
+
+                // География
+                this.assignList(oldProject, newProject, 'geography', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+
+                // Задачи
+                this.assignList(oldProject, newProject, 'jobs', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+
+                // Цели проекта
+                this.assignList(oldProject, newProject, 'goals', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+
+                // Количественные результаты
+                this.assignList(oldProject, newProject, 'quant_results', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+
+                // Партнеры
+                this.assignList(oldProject, newProject, 'partners', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+
+                // Целевые группы
+                this.assignList(oldProject, newProject, 'target_groups', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+
+                // Команда проекта
+                this.assignList(oldProject, newProject, 'members', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+
+                // Образование и работа
+                this.assignList(oldProject, newProject, 'institutions', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+
+                // Календарный план
+                this.assignList(oldProject, newProject, 'events', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+
+                // Бюджет
+                this.assignList(oldProject, newProject, 'generic_costs', function (old, newItem) {
+                    return (old.guid === newItem.guid)
+                })
+            },
+            async organizationAutofill(){
+
+                let _url = url_conturapi + '?ogrn=' + this.project.organization.ogrn
+
+                const response = await fetch(_url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "X-CSRFToken": csrf_token
+                    },
+                    //body: JSON.stringify(this.project)
+                })
+
+                if (response.ok) {
+                    let res = await response.json();
+                    if (res.org) {
+                        Vue.toasted.show('Получено', { fullWidth: true, type: "success", duration: 800 })
+                        //this.project = JSON.parse(res.project);
+                        //this.assignProject(this.project, JSON.parse(res.project))
+                        //this.$root.autosave();
+                        console.warn('response', res.org)
+                        this.assignOrganization(res.org)
+                    }
+                } else {
+                    Vue.toasted.show('Ошибка получения организации', { fullWidth: true, type: "error", duration: 800 })
+                }
+                //this.saveDisabled = false
+
+            },
+            assignOrganization(org){
+                let main_activity = org.ergDetails.UL.activities.principalActivity
+                let main_activity_text = `${main_activity.code} ${main_activity.text}`
+
+                let maintainer = org.UL.heads[0]
+
+                let dict = {
+                    ogrn: org.ogrn,
+                    inn: org.inn,
+                    kpp: org.UL.kpp,
+                    full_name: org.full_name,
+                    short_name: org.short_name,
+                    registration_date: new Date(org.UL.registrationDate),
+                    //7.3
+                    address: this.getAddress(org.UL.legalAddress),
+                    fact_address: this.getAddress(org.UL.legalAddress),
+                    legal_address: this.getAddress(org.UL.legalAddress),
+
+                    main_activities: [main_activity_text].map(s=>({content: s, status: 'new'})),
+
+                    manager_fio: maintainer.fio,
+                    manager_position: maintainer.position,
+
+                    trusted_persons: [maintainer.fio].map(s=>({content: s, status: 'new'})),
+
+                }
+
+                for(let key in dict){
+                    this.project.organization[key] = dict[key]
+                }
+
+                let file_type = 'organization_egrul'
+                let file_url = org.file_egr
+                let file_name = org.file_egr.replace('/media/','')
+
+                if(!this.$root.project["project_files"].find(s=>s.name == file_name)){
+                    this.$root.project["project_files"].push({
+                        name: file_name,
+                        type: file_type,
+                        url: file_url,
+                    })
+                }
+            },
+            getAddress(legalAddress){
+                let arr = 'regionName,district,city,settlement,street,house,bulk,flat'.split(',')
+
+                let ff = ['topoFullName','topoValue']
+
+                let list = []
+
+                if(legalAddress.parsedAddressRF.zipCode){
+                    list.push(legalAddress.parsedAddressRF.zipCode)
+                }
+
+                let data = legalAddress.parsedAddressRF
+
+                for(let key of arr){
+                    if(key in data){
+                        let val = `${data[key].topoFullName} ${data[key].topoValue}`
+                        list.push(val)
+                    }
+                }
+
+                return list.join(', ')
+
+                //deprecated
+                let region_subject = `${legalAddress.parsedAddressRF.regionName.topoFullName} ${legalAddress.parsedAddressRF.regionName.topoValue}`
+                let region_region = `${legalAddress.parsedAddressRF.district.topoValue} ${legalAddress.parsedAddressRF.district.topoFullName}`
+                let region_city = `${legalAddress.parsedAddressRF.settlement.topoFullName} ${legalAddress.parsedAddressRF.settlement.topoValue}`
+                let address = `${legalAddress.parsedAddressRF.street.topoFullName} ${legalAddress.parsedAddressRF.street.topoValue}`
+                let house = `${legalAddress.parsedAddressRF.house.topoFullName} ${legalAddress.parsedAddressRF.house.topoValue}`
+                return `${legalAddress.parsedAddressRF.zipCode}, ${region_subject}, ${region_region}, ${region_city}, ${address}, ${house}`
+            },
+            disabledProjectDates(date) {
+              const startDate = new Date(new Date().getFullYear(), 5, 1);
+              const finishDate = new Date(new Date().getFullYear() + 1, 5, 1);
+
+              return date < startDate || date > finishDate;
+            },
+            disabledBirthDates(date) {
+              const startDate = new Date();
+              startDate.setFullYear(startDate.getFullYear() - 18)
+
+              return date > startDate;
+            },
+        }
+    });
+
+
+</script>
+{%endblock%}

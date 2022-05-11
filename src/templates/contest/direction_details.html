@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <a href="javascript:history.back()"><h4>Назад</h4></a>
+        <h3 class="site-heading mb-4">{{ direction.title }}</h3>
+        <h5 class="site-heading mb-4">Максимальный лимит по направлению {{ direction.max_sum }} руб. </h5>
+        <div class="row">
+            <ol>
+                {% for subject in direction.subject_set.all %}
+                    <li class="mb-4">{{ subject.title }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+{% endblock %}

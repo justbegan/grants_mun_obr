@@ -1,0 +1,266 @@
+{% load static %}
+{% load auth_extras %}
+{% load notifications_tags %}
+{% load formatters %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Гранты</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600" rel="stylesheet">
+    <link rel="shortcut icon" href="{% static 'favicon1.ico' %}" type="image/x-icon">
+
+    <meta name="google" content="notranslate"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}?v=4"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'style-mobile.css' %}"/>
+
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/f4bed6e6ff.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+</head>
+<body>
+
+<!-- Navigation -->
+<div class="p-3 text-center">
+    Консультации по проектированию: <b><a href="tel:{{ support_phone }}"> {{ support_phone|phone_format }}</a></b><br>
+    Телефон технической поддержки: <b><a href="tel:{{ support_phone }}"> {{ tech_support_phone|phone_format }}</a></b><br>
+    Отдел по взаимодействию с институтами гражданского общества <br>
+    Министерства по делам молодежи и социальным коммуникациям Республики Саха (Якутия) <b>507-123, 507-128</b>
+</div>
+<div class="navbar-wrapper sticky-top">
+    <nav class="navbar navbar-expand-md d-none d-md-block">
+        <div class="container">
+            <a class="navbar-brand mr-auto" href="{% url 'contest-home' %}"><img width="175px" src="{% static 'grant1_logo.png' %}"></a>
+            <div class="ml-auto">
+                {% if user.is_authenticated %}
+
+
+                        
+                {% if "mun_obr" in request.get_full_path %}
+
+                <a class="btn btn-link text-dark mr-4" href="{% url 'mun_obr_profile' %}">
+                    <i class="fas fa-user mr-1"></i>
+                    Личный кабинет мун обр
+                    {% if notifications_unread %}
+                        <span class="badge badge-pill badge-primary"> {{ notifications_unread }} </span>
+                    {% endif %}
+                </a>
+                <a class="btn btn-link text-dark" href="{% url 'account_logout' %}">
+                    <i class="fas fa-door-open mr-1"></i>
+                    Выйти ({{ user.username }})
+                </a>
+
+
+            {% else %}
+
+
+                    <a class="btn btn-link text-dark mr-4" href="{% url 'profile-home' %}">
+                        <i class="fas fa-user mr-1"></i>
+                        Личный кабинет
+                        {% if notifications_unread %}
+                            <span class="badge badge-pill badge-primary"> {{ notifications_unread }} </span>
+                        {% endif %}
+                    </a>
+                    <a class="btn btn-link text-dark" href="{% url 'account_logout' %}">
+                        <i class="fas fa-door-open mr-1"></i>
+                        Выйти ({{ user.username }})
+                    </a>
+
+                    {% endif %}
+                {% else %}
+                    <a class="btn btn-outline-dark" href="{% url 'account_login' %}">Войти</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <nav class="navbar navbar-expand-md d-none d-md-block">
+        <div class="container">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'contest-home' %}active{% endif %}" href="{% url 'contest-home' %}">Конкурсы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'project-home' %}active{% endif %}" href="{% url 'project-home' %}">Проекты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}" href="{% url 'news' %}">Новости</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'faq' %}">Вопросы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'course' %}active{% endif %}" href="{% url 'course' %}">Курсы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" target="_blank" href="https://erc-portal.ru/">Карта гражданских инициатив</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/mun_obr">Муниципальным образованиям</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'project-best-projects' %}">Витрина лучших проектов</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'project-vote-projects' %}">Онлайн-голосование</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="navbar d-block d-md-none">
+        <div class="container">
+            <a class="navbar-brand mr-auto" href="{% url 'contest-home' %}"><img width="175px" src="{% static 'grant1_logo.png' %}"></a>
+            <i class="fas fa-bars fa-lg ml-auto" id="nm-open" style="color: #508E96"></i>
+        </div>
+    </div>
+</div>
+
+<div class="navbar-mobile d-none d-md-none text-center" id="navbar-mobile">
+    <div class="nm-close" id="nm-close">
+        <i class="fas fa-times fa-lg"></i>
+    </div>
+    <div class="nm-navs pt-3">
+        <a class="nm-brand" href="{% url 'contest-home' %}"><img width="175px" src="{% static 'grant1_logo.png' %}"></a>
+        <div class="nm-links">
+            <a class="nm-nav-link {% if request.resolver_match.url_name == 'contest-home' %}active{% endif %}" href="{% url 'contest-home' %}">Конкурсы</a>
+            <a class="nm-nav-link {% if request.resolver_match.url_name == 'project-home' %}active{% endif %}" href="{% url 'project-home' %}">Проекты</a>
+            <a class="nm-nav-link {% if request.resolver_match.url_name == 'news' %}active{% endif %}" href="{% url 'news' %}">Новости</a>
+            <a class="nm-nav-link {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'faq' %}">Вопросы</a>
+            <a class="nm-nav-link {% if request.resolver_match.url_name == 'course' %}active{% endif %}" href="{% url 'course' %}">Курсы</a>
+        </div>
+        <div class="nm-projects">
+            <a class="nm-nav-link active" href="{% url 'project-best-projects' %}">Витрина лучших проектов</a>
+            <a class="nm-nav-link active" href="{% url 'project-vote-projects' %}">Онлайн-голосование</a>
+        </div>
+        <div class="nm-buttons">
+            {% if user.is_authenticated %}
+                
+
+                <a class="btn btn-link btn-block text-dark" href="{% url 'profile-home' %}">
+                    <i class="fas fa-user mr-1"></i>
+                    Личный кабинет
+                    {% if notifications_unread %}
+                        <span class="badge badge-pill badge-primary"> {{ notifications_unread }} </span>
+                    {% endif %}
+                </a>
+                <a class="btn btn-link btn-block text-dark" href="{% url 'account_logout' %}">
+                    <i class="fas fa-door-open mr-1"></i>
+                    Выйти ({{ user.username }})
+                </a>
+              
+            {% else %}
+                <a class="btn btn-outline-dark" href="{% url 'account_login' %}">Войти</a>
+            {% endif %}
+            
+
+        
+
+            
+            
+
+
+
+       
+
+        </div>
+    </div>
+</div>
+
+<div class="content">
+{% block content %}
+    <!-- Content Goes here -->
+{% endblock content %}
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-3">
+                <a href="https://yakutia.click/" class=""><img src="{% static 'new_logo_footer.svg' %}"></a>
+                <div class="contacts pt-4 d-none d-md-block">
+                    <p>
+                        <a href="tel:{{ support_phone }}">{{ support_phone|phone_format }}</a> <br>
+                        <a href="mailto:info@yakutia.click">info@yakutia.click</a><br>
+                        <a href="https://yandex.ru/maps/-/CGtbBGpy">проспект Ленина, 1</a>
+                    </p>
+                    <p>
+                        Министерство инноваций, цифрового развития и инфокоммуникационных технологий Республики Саха (Якутия)
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-7 offset-md-1 links pt-4 pt-md-0">
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <a href="http://iltumen.ru/">Государственное Собрание (Ил Тумэн) Республики Саха (Якутия)</a>
+                        <a href="https://www.sakha.gov.ru/">Администрация Главы и Правительства РС(Я)</a>
+                        <a href="https://e-yakutia.ru">Портал государственных и муниципальных услуг </a>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a href="https://vshim.ru/">Высшая школа инновационного менеджмента при Главе Республики Саха (Якутия)</a>
+                        <a href="http://tpykt.ru/">Технопарк «Якутия»</a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-12 d-block d-md-none">
+                <div class="contacts pt-4">
+                    <p>
+                        <a href="tel:{{ support_phone }}">{{ support_phone|phone_format }}</a> <br>
+                        <a href="mailto:info@yakutia.click">info@yakutia.click</a><br>
+                        <a href="https://yandex.ru/maps/-/CGtbBGpy">проспект Ленина, 1</a>
+                    </p>
+                    <p>
+                        Министерство инноваций, цифрового развития и инфокоммуникационных технологий Республики Саха (Якутия)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script type="text/javascript">
+$(document).ready(() => {
+    $navbar = $('#navbar-mobile');
+
+    $('#nm-open').click(() => {
+        $navbar.css({top: window.scrollY});
+        $('body').css({overflow: 'hidden', height: '100%'});
+        $navbar.removeClass('d-none');
+        $navbar.addClass('d-close');
+        $navbar.animate({
+            opacity: 1
+        }, 300);
+        $navbar.find('.nm-navs').animate({
+            right: 0
+        }, 300);
+    });
+
+    $('#nm-close').click(() => {
+        $('body').css({overflow: 'auto', height: 'auto'});
+        $navbar.animate({
+            opacity: 0
+        }, 300);
+        $navbar.find('.nm-navs').animate({
+            right: -800
+        }, 300, () => {
+            $navbar.removeClass('d-block');
+            $navbar.addClass('d-none');
+        });
+    });
+})
+</script>
+
+</body>
+</html>

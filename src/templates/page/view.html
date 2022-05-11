@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container page-view materials {% if page.related_tag %}page-related{% endif %}">
+
+        {% if page.related_tag %}
+            <h3 class="site-heading mb-4">Конкурсы</h3>
+            {% for related in related_pages %}
+                [ <a href="{% url 'page' related.slug %}" class="materials-btn {% if related.id == page.id %}active{% endif %}" role="button">
+                    {{ related.title }}
+                </a> ]
+            {% endfor %}
+        {% endif %}
+
+        <div class="page-view-main">
+            <h3 class="site-heading mb-4">{{ page.title }}</h3>
+
+            <div class="row">
+                <div class="col-12">
+                    {{ page.html | safe }}
+                </div>
+            </div>
+        </div>
+
+        {% if page.related_tag %}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h3 class="site-heading mb-4" style="text-align: center">Документы</h3>
+                    {% include 'contest/_documents_table.html' %}
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

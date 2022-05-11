@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container">
+        <h3 class="site-heading mb-4">Документы</h3>
+    </div>
+
+    <div class="documents container materials">
+        {% for tag in tags %}
+            [ <a href="?tag={{ tag.slug }}" class="materials-btn {% if tag.slug == current_tag.slug %}active{% endif %}" role="button">
+                {{ tag.name }}
+            </a> ]
+        {% endfor %}
+
+        <div class="row">
+            {% include 'contest/_documents_table.html' %}
+        </div>
+    </div>
+
+{% endblock %}

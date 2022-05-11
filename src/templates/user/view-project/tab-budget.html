@@ -1,0 +1,84 @@
+{% load filter %}
+{% for type in budget_types %}
+    <div class="row" style="background: rgb(235, 246, 254); padding: 8px;">
+        <h5>{{ budget_type|get_item:type }}</h5>
+    </div>
+    <table class="table table-hover table-sm">
+        <thead>
+        <tr>
+            <th scope="col">Статья</th>
+            <th scope="col">Сумма</th>
+            <th scope="col">Количество ед.</th>
+            <th scope="col">Общая стоимость</th>
+            <th scope="col">Софинансирование</th>
+            <th scope="col">Запрашиваемая сумма</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        {% for item in project.genericcost_set.all|in_type:type %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.cost }}</td>
+                <td>{{ item.items_count }}</td>
+                <td>{{ item.total }}</td>
+                <td>{{ item.co_financing }}</td>
+                <td>{{ item.request_total }}</td>
+                <td>
+                    <a data-toggle="collapse" href="#info-{{ item.id }}"
+                       aria-expanded="false" aria-controls="info-{{ item.id }}">
+                        <i class="fas fa-comment"></i>
+                    </a>
+                </td>
+            </tr>
+
+            <tr class="collapse" id="info-{{ item.id }}">
+                <td colspan="7">Комментарий: {{ item.comment }} </td>
+            </tr>
+        {% endfor %}
+
+        <tr>
+            <td></td>
+            <td></td>
+            <th>ИТОГО</th>
+            <th> {% call_method project 'budget_sum_by_type' type %}</th>
+            <th> {% call_method project 'budget_co_financing_sum_by_type' type %}</th>
+            <th> {% call_method project 'budget_request_sum_by_type' type %}</th>
+            <th></th>
+        </tr>
+        </tbody>
+
+    </table>
+    <hr><br>
+{% endfor %}
+
+<table class="table table-hover table-sm">
+    <thead>
+    <tr>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col">Общая сумма расходов на реализацию проекта</th>
+        <th scope="col">Софинансирование</th>
+        <th scope="col">Запрашиваемая сумма</th>
+        <th></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr>
+        <td></td>
+        <td></td>
+        <th>ИТОГО</th>
+        <th>{{ project.budget_sum }}</th>
+        <th>{{ project.budget_co_financing_sum }}</th>
+        <th>{{ project.budget_request_sum }}</th>
+        <th></th>
+    </tr>
+    </tbody>
+
+</table>
+Софинансирование: {{ project.co_finance_percent }}%
+

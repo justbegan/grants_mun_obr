@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+    {% load crispy_forms_tags %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                {% include "profile/side.html" %}
+            </div>
+            <div class="col-sm-10">
+                <h6><a href="{% url 'user-view-project' project.id %}">Назад к проекту</a></h6>
+                <h2>Отправка на проверку</h2>
+                <h4>Проект: {{ project.title }}</h4>
+                <h4>Автор: {{ project.author }}</h4>
+                <hr>
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li  {% if message.tags %}
+                                class="text-{{ message.tags }}" {% endif %}> {{ message }} </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary">На проверку</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

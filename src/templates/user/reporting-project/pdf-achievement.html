@@ -1,0 +1,137 @@
+{% load static %}
+{% load filter %}
+{% load formatters %}
+{% load auth_extras %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+
+<style>
+    @media print {
+        @page {
+
+            size: A4{% if landscape %} landscape{% endif %};
+
+            {#margin: 0;#}
+        }
+        html, body {
+            {#width: 297mm;#}
+            {#width: 210mm;#}
+            {#height: 210mm;#}
+            {#height: 297mm;#}
+        }
+        /* ... the rest of the rules ... */
+    }
+    .table.table-bordered th, .table.table-bordered td {
+        border: 1px solid black !important;
+    }
+    .podpis {
+        border-bottom: 1px solid black;
+    }
+    .mt-100 {
+        margin-top: 100px;
+    }
+    .mt-40 {
+        margin-top: 40px;
+    }
+    .mb-20 {
+        margin-bottom: 20px;
+    }
+</style>
+
+<body>
+
+<div class="container">
+    <div class="row justify-content-end">
+        <div class="col-8 text-center">
+            По Соглашению о предоставлении из государственного бюджета<br>
+            Республики Саха (Якутия) грантов Главы Республики Саха (Якутия) на<br>
+            развитие институтов гражданского общества в Республике Саха<br>
+            (Якутия), утвержденного приказом Министерства по делам молодежи<br>
+            и социальным коммуникациям Республики Саха (Якутия)<br>
+            от
+            {% if project.is_have_agreements %}
+                {% for a in project.get_agreements %}
+                    {{ a.date|date:'d.m.Y' }} № {{ a.number }}
+                {% endfor %}
+            {% else %}
+                <span style="color: red">??.??.???? № ??</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<h4 class="text-center mb-20">
+    Отчет о достижении показателей результативности предоставления гранта Главы Республики Саха (Якутия)<br>
+    на развитие гражданского общества в Республике Саха (Якутия) на реализацию проекта<br>
+    «{{ project.title }}»
+</h4>
+
+<div>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th rowspan="2">№</th>
+            <th rowspan="2">Наименование показателя</th>
+            <th colspan="2">Единица измерения по ОКЕИ/ Единица измерения</th>
+            <th rowspan="2">Срок, на который запланировано достижение показателя</th>
+            <th rowspan="2">Плановое значение показателя</th>
+            <th rowspan="2">Фактически достигнутое значение</th>
+            <th rowspan="2">Причина отклонения</th>
+        </tr>
+        <tr>
+            <th>Наименование</th>
+            <th>Код</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for t in indicator_types %}
+            {% with i=indicators|get_item:t.0 %}
+                <tr>
+                    <td>{{ t.0 }}</td>
+                    <td>{{ t.2 }}</td>
+                    <td>{{ t.3 }}</td>
+                    <td>{{ t.4 }}</td>
+                    {% if t.1 %}
+                        <td>{{ i.date|date:'d.m.Y'|default:'-' }}</td>
+                        <td>{{ i.planned|default_if_none:'-' }}</td>
+                        <td>{{ i.value|default_if_none:'' }}</td>
+                        <td>{{ i.reason|default_if_none:'' }}</td>
+                    {% else %}
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    {% endif %}
+                </tr>
+            {% endwith %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container mt-100">
+    <div class="row">
+        <div class="col text-center">
+            <div class="podpis"></div>
+            Наименование должности
+            руководителя СО НКО -
+            получателя гранта
+        </div>
+        <div class="col text-center">
+            <div class="podpis"></div>
+            Подпись
+        </div>
+        <div class="col text-center">
+            <div class="podpis"></div>
+            ФИО
+        </div>
+    </div>
+    <div class="row mt-40">
+        <div class="col">
+            «_____» ___________________ 20____ г.
+            <br><br>М.п.
+        </div>
+    </div>
+</div>
+
+
+</body>

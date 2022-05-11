@@ -1,0 +1,145 @@
+{% load auth_extras %}
+<table class="table table-hover table-sm">
+<tr>
+    <td width="400px">1. Грантовое направление, которому преимущественно соответствует планируемая деятельность по проекту:</td>
+    <td>
+        {{ project.direction.title|default:"Не выбрано" }}
+    </td>
+</tr>
+<tr>
+    <td>2. Название проекта, на реализацию которого запрашивается грант:</td>
+    <td>
+        {{ project.title|default:"Не заполнено" }}
+    </td>
+</tr>
+<tr>
+    <td>3. Краткое описание проекта (деятельности в рамках проекта):</td>
+    <td>
+        {{ project.description|default:"Не заполнено"|linebreaks }}
+    </td>
+</tr>
+<tr>
+    <td>4. География проекта:</td>
+    <td>
+        {% if not project.geography_list %} Не заполнено {% endif %}
+        <ul>
+            {% for geo in project.geography_list %}
+                <li>{{ geo }}</li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+<tr>
+    <td>5. Дата начала реализации проекта:</td>
+    <td>{{ project.start_date|default:"Не заполнено" }}</td>
+</tr>
+<tr>
+    <td>6. Дата окончания реализации проекта:</td>
+    <td>{{ project.finish_date|default:"Не заполнено" }}</td>
+</tr>
+<tr>
+    <td>7. Обоснование социальной значимости проекта:</td>
+    <td>{{ project.social_significance|default:"Не заполнено" }}</td>
+</tr>
+<tr>
+    <td>7.1. Полное описание проекта, презентация проекта:</td>
+    <td>
+        {% if not project.presentation_files %} Не загружено {% endif %}
+        <ul>
+            {% for presentation_file in project.presentation_files %}
+                <li><a href="/media/{{presentation_file.file }}">{{ presentation_file.file }}</a></li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+<tr>
+    <td>8. Целевые группы проекта:</td>
+    <td>
+    {% if not project.target_groups %} Не заполнено {% endif %}
+        <ul>
+            {% for group in project.target_groups %}
+                <li>{{ group.title }}</li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+<tr>
+    <td>9. Цель проекта:</td>
+    <td>
+        <ul>
+            {% for goal in project.goal_set.all %}
+                <li>{{ goal.content }}</li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+<tr>
+    <td>10. Задачи проекта:</td>
+    <td>
+        <ul>
+            {% for job in project.job_set.all %}
+                <li>{{ job.content }}</li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+<tr>
+    <td>11. Партнёры проекта:</td>
+    <td>
+        {% if not project.partner_set.all %} Не заполнено {% endif %}
+        <ul>
+            {% for partner in project.partner_set.all %}
+                <li>
+                    {{ partner.name }} ({{partner.supports}})
+                </li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+<tr>
+    <td>11.1. Письма поддержки, соглашения о сотрудничестве и иные аналогичные документы:</td>
+    <td> 
+        {% if not project.letter_files %} Не загружено {% endif %}
+        <ul>
+            {% for letter_file in project.letter_files %}
+                <li><a href="/media/{{letter_file.file }}">{{ letter_file.file }}</a></li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+
+<tr>
+    <td>12. Как будет организовано информационное сопровождение проекта:</td>
+    <td>{{ project.info_support|default:"Не заполнено" }}</td>
+</tr>
+
+<tr>
+    <td>13. Количественные результаты:</td>
+    <td>
+        {% if not project.quantresult_set.all %} Не заполнено {% endif %}
+    </td>
+</tr>
+
+{% for result in project.quantresult_set.all %}
+<tr>
+    <td>{{ result.name }}</td>
+    <td>{{ result.count }}</td>
+</tr>
+{% endfor %}
+<tr>
+    <td>&nbsp;</td>
+    <td></td>
+</tr>
+<tr>
+    <td>14. Качественные результаты:</td>
+    <td>{{ project.quality_results|default:"Не заполнено" }}</td>
+</tr>
+<tr>
+    <td>15. Дальнейшее развитие проекта:</td>
+    <td>{{ project.further_progress|default:"Не заполнено" }}</td>
+</tr>
+<tr>
+    <td>16. Источники ресурсного обеспечения проекта в дальнейшем:</td>
+    <td>{{ project.sources|default:"Не заполнено" }}</td>
+</tr>
+</table>

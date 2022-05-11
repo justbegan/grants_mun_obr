@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    {% load auth_extras %}
+    {% load crispy_forms_tags %}
+    {% load render_table from django_tables2 %}
+
+    <script src="{% static 'js/vue.js' %}"></script>
+    <script src="{% static 'js/vuejs-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/vuejs-datepicker-ru.js' %}"></script>
+    <script src="{% static 'js/vue-toasted.min.js' %}"></script>
+    <script src="{% static 'js/vue-js-modal.js' %}"></script>
+    <style>
+        .tabs > ul {
+            margin-left: -20px;
+        }
+
+        .tabs >
+        ul li {
+            vertical-align: top;
+            display: inline-block;
+            padding: 8px;
+            margin-right: 1px;
+            background: #f5fafe;
+
+        }
+
+        .tabs, ul a {
+            color: black;
+        }
+
+        .is-active {
+            background: #508E96 !important;
+        }
+
+        a .is-active {
+            color: white !important;
+        }
+
+        textarea {
+            width: 100%;
+        }
+
+        option {
+            width: 100px !important;
+        }
+
+        input:required, textarea:required {
+            border: 1px solid green;
+        }
+
+        input:required:invalid, textarea:required:invalid {
+            border: 1px solid red;
+            background: rgb(252, 217, 217);
+        }
+    </style>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                {% include "profile/side.html" %}
+            </div>
+            <div id="app" class="col-sm-10">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h2>Отчет по проекту №{{ project.id }}</h2>
+                        <h4>{{ project.title }}</h4>
+                    </div>
+                    <div class="col-md-2">
+                        <a onclick="return confirm('После подачи отчета, отредактировать заявку будет невозможно. Продолжить?')"
+                           href="{% url 'user-report-publish' project.id %}" class="materials-btn">Подать отчет</a>
+                    </div>
+                </div>
+                <tabs :save="save" default="smeta">
+
+                    <tab id="smeta" name="Смета реализации проекта">
+                        <smetatable label="Смета реализации проекта"></smetatable>
+                    </tab>
+                    <tab id="cost" name="Отчет о расходах">
+                        <h5>
+                            ОТЧЕТ о расходах, источником финансового обеспечения которых
+                            является субсидии из государственного
+                            бюджета на государственную поддержку социально
+                            ориентированных некоммерческих организаций
+                        </h5>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Дата заключения (подписания) соглашения</label>
+                                <vuejs-datepicker format="dd.MM.yyyy" class="form-control"
+                                                  v-model="report.cost.agreement_date" :language="ru">
+                                </vuejs-datepicker>
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Номер соглашения</label>
+                                <input class="form-control" v-model="report.cost.agreement_number">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Размер предоставленной субсидии (руб.)</label>
+                                <input type="number" class="form-control" v-model="report.cost.grant_sum">
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Дата получения субсидии</label>
+                                <vuejs-datepicker format="dd.MM.yyyy" class="form-control"
+                                                  v-model="report.cost.grant_date" :language="ru">
+                                </vuejs-datepicker>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>
+                                    Общий объем расходов, источником
+                                    финансового обеспечения которых
+                                    является субсидия, в отчетном году
+                                    (руб.)</label>
+                                <input type="number" class="form-control" v-model="report.cost.total_cost">
+                            </div>
+                            <div class="col-sm-6">
+                                <br>
+                                <label>из них по целевому назначению (руб.)</label>
+                                <input type="number" class="form-control" v-model="report.cost.total_cost_target">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Остаток субсидии на дату окончания срока реализации программы (проекта)</label>
+                                <input type="number" class="form-control" v-model="report.cost.grant_balance">
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Сумма субсидии, подлежащая возврату в государственный бюджет (руб.)</label>
+                                <input type="number" class="form-control" v-model="report.cost.grant_return">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Виды деятельности, в том числе приоритетные направления, для осуществления
+                                    мероприятий,
+                                    по которым в отчетном году использовалась субсидия</label>
+                                <textarea rows="5" class="form-control" v-model="report.cost.activities"></textarea>
+                            </div>
+                            <div class="col-sm-6">
+                            </div>
+                        </div>
+                        <hr>
+                        <costtable label="Сведения о софинансировании социально ориентированной некоммерческой организацией-
+                                        получателем субсидии реализации программы, для осуществления мероприятий которой
+                                        предоставлена субсидия, за счет других источников в отчетном году">
+                        </costtable>
+                        <hr>
+                        <reestrcosttable
+                                label="Реестр расходов, источником финансового обеспечения которых является субсидия, за отчетный год">
+                        </reestrcosttable>
+                    </tab>
+                    <tab id="result" name="Значения показателей результативности">
+                        <h5>
+                            ОТЧЕТ
+                            о достижении значений показателей результативности
+                            предоставления субсидии из государственного
+                            бюджета на государственную поддержку социально
+                            ориентированных некоммерческих организаций
+                        </h5>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Дата заключения (подписания) соглашения</label>
+                                <vuejs-datepicker format="dd.MM.yyyy" class="form-control"
+                                                  v-model="report.result.agreement_date" :language="ru">
+                                </vuejs-datepicker>
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Номер соглашения</label>
+                                <input type="number" class="form-control" v-model="report.result.agreement_number">
+                            </div>
+                        </div>
+                        <hr>
+                        <successtable
+                                label="Сведения о достижении значений показателей результативности предоставления субсидии, установленных соглашением">
+                        </successtable>
+                    </tab>
+                    <tab id="plan" name="Календарный план">
+                        <table class="table">
+                            <thead>
+                            <th width="38%">Мероприятие</th>
+                            <th width="12%">Дата начала</th>
+                            <th width="12%">Дата окончания</th>
+                            <th width="38%">Ожидаемые результаты</th>
+                            </thead>
+                            <tbody>
+                            <template v-for="event in events">
+                                <tr >
+                                    <td>[[event.name]]</td>
+                                    <td>[[event.start_date]]</td>
+                                    <td>[[event.finish_date]]</td>
+                                    <td>[[event.result]]</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <h6>Отчет по мероприятию</h6>
+                                        <textarea rows="2" class="form-control" v-model="event.report"></textarea>
+                                    </td>
+                                </tr>
+                            </template>
+                            </tbody>
+                        </table>
+                    </tab>
+                </tabs>
+                <div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="{% static 'vue/tabs.js' %}"></script>
+    <script src="{% static 'vue/report/smetatable.js' %}"></script>
+    <script src="{% static 'vue/report/costtable.js' %}"></script>
+    <script src="{% static 'vue/report/reestrcosttable.js' %}"></script>
+    <script src="{% static 'vue/report/successtable.js' %}"></script>
+    <script>
+        const csrf_token = "{{ csrf_token }}"
+        const report =
+        {{ report | safe }}
+        const events =
+        {{ events | safe }}
+        const url = "{% url 'user-save-report' project_id %}";
+
+        Vue.use(Toasted)
+        Vue.use(window["vue-js-modal"].default)
+
+        const app = new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data: {
+                report: report,
+                events: events,
+                ru: vdp_translation_ru.js,
+                csrf_token: csrf_token,
+            },
+            computed: {},
+            components: {
+                vuejsDatepicker,
+            },
+            methods: {
+                validate() {
+                    return true;
+                },
+                async save() {
+                    if (this.validate()) {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                "X-CSRFToken": csrf_token
+                            },
+                            body: JSON.stringify({
+                                'report': this.report,
+                                'events': this.events
+                            })
+                        })
+                        if (response.ok) {
+                            const res = await response.json();
+
+                            Vue.toasted.show('Сохранено', {fullWidth: true, type: "success", duration: 800})
+                            this.report = res.report
+                            //this.events = res.events
+                            //Vue.set(this.project, 'generic_costs', project.generic_costs)
+
+                        } else {
+                            Vue.toasted.show('Ошибка сохранения', {fullWidth: true, type: "error", duration: 800})
+                        }
+                    }
+                },
+            }
+        });
+    </script>
+{% endblock %}

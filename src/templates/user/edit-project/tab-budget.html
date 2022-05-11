@@ -1,0 +1,46 @@
+<moneytable col1="Должность" col2="Заработная плата в месяц (в рублях, включая НДФЛ)"
+    col3="Количество месяцев (не более 12 месяцев)" label="1.1 Оплата труда штатных работников"
+    type='salary'>
+</moneytable>
+
+<moneytable col1="Функция в проекте или содержание услуг (работ)"
+    col2="Вознаграждение по одному договору (в рублях, включая НДФЛ)" col3="Количество договоров"
+    label="1.2 Выплаты физическим лицам (за исключением индивидуальных предпринимателей) за оказание ими услуг (выполнение работ) по гражданско-правовым договорам"
+    v-model="project.generic_costs" type='payouts'>
+</moneytable>
+
+<insurancetable label="1.3 Страховые взносы" v-model="project.generic_costs">
+</insurancetable>
+
+<moneytable col1="Наименование расходов" col2="Расходы на одного работника (в рублях)"
+    col3="Количество работников" label="2. Командировочные расходы" v-model="project.generic_costs" type='travel'>
+</moneytable>
+
+<moneytable col1="Наименование расходов" col2="Стоимость единицы (в рублях)" col3="Кол-во единиц"
+    label="3. Офисные расходы " v-model="project.generic_costs" type='office'></moneytable>
+
+<moneytable col1="Наименование расходов" col2="Стоимость единицы (в рублях)" col3="Кол-во единиц"
+    label="4. Приобретение, аренда специализированного оборудования, инвентаря и сопутствующие расходы"
+    v-model="project.generic_costs" type='equipment'></moneytable>
+
+<moneytable col1="Наименование расходов" col2="Стоимость единицы (в рублях)" col3="Кол-во единиц"
+    label="5. Разработка и поддержка сайтов, информационных систем и иные аналогичные расходы"
+    v-model="project.generic_costs" type='devel'></moneytable>
+
+<moneytable col1="Наименование расходов" col2="Стоимость единицы (в рублях)" col3="Кол-во единиц"
+    label="6. Оплата юридических, информационных, консультационных услуг и иные аналогичные расходы"
+    v-model="project.generic_costs" type='legal'></moneytable>
+
+<moneytable col1="Наименование расходов" col2="Стоимость единицы (в рублях)" col3="Кол-во единиц"
+    label="7. Расходы на проведение мероприятий" v-model="project.generic_costs" type='events'>
+</moneytable>
+
+<moneytable col1="Наименование расходов" col2="Стоимость единицы (в рублях)" col3="Кол-во единиц"
+    label="8. Издательские, полиграфические и сопутствующие расходы" v-model="project.generic_costs" type='publishing'>
+</moneytable>
+
+<moneytable col1="Наименование расходов" col2="Стоимость единицы (в рублях)" col3="Кол-во единиц"
+    label="9. Прочие прямые расходы" v-model="project.generic_costs" type='other'></moneytable>
+
+
+<totalmoney v-model="project.generic_costs"></totalmoney>

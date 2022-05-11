@@ -1,0 +1,65 @@
+<h2>Оценочный лист</h2>
+<div>
+№ Заявки: <a href="{% url 'user-view-project' score_sheet.project.id %}">{{ score_sheet.project.id }}</a><br>
+Проект: {{ score_sheet.project.title }} <br>
+Стоимость проекта: {{ score_sheet.project.budget_sum }} <br>
+Запрашиваемая сумма: {{ score_sheet.project.budget_request_sum }}
+</div>
+<table>
+    <tr>
+        <td>Если организация состоит в реестре исполнителей общественно полезных услуг:</td>
+        <td>{{ score_sheet.additional_score1 }}</td>
+    </tr>
+    <tr>
+        <td>Если Заявитель является организацией, оказывающей информационную, консультационную,
+            методическую, образовательную, экспертную и иную поддержку социально ориентированным
+            некоммерческим организациям, возглавляющим рейтинг эффективности деятельности за предыдущий
+            отчетный период, разработанного Уполномоченным органом, размещаемом на Портале:
+        </td>
+        <td>{{ score_sheet.additional_score2 }}</td>
+    </tr>
+</table>
+
+
+<table class="table">
+    <tr>
+        <th width="500px">Критерии</th>
+        <th>Баллы</th>
+        {% comment %} <th>Коэффициент</th> {% endcomment %}
+        <th>Комментарий</th>
+    </tr>
+    {% for score in score_sheet.score_set.all %}
+
+        <tr data-id="x-form-{{score.criteria.id}}">
+            <td>
+                <label>{{ score.criteria }}</label>
+                <br>
+            </td>
+            <td>
+                {{ score.score }}
+            </td>
+            {% comment %} <td>
+                {{ score.coefficient }}
+            </td> {% endcomment %}
+            <td>
+                {{ score.comment|default:"" }}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <th>Сумма оценок</th>
+        <th>{{ score_sheet.score_sum }}</th>
+        {% comment %} <th></th> {% endcomment %}
+        <th></th>
+    </tr>
+    <tr>
+        <th>Сумма оценок с учетом коэффициента</th>
+        <th>{{ score_sheet.score_total_sum }}</th>
+        {% comment %} <th></th> {% endcomment %}
+        <th></th>
+    </tr>
+</table>
+
+<style>
+tr[data-id="x-form-11"]{display:none !important;}
+</style>

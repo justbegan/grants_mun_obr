@@ -1,0 +1,11 @@
+<div class="card mb-4 mx-auto col-11 p-0 {% if not single %} mx-sm-3 col-md-4{% endif %}" style="min-width: 200px;">
+    <a href="{% url 'news_detail' news.pk  %}" style="text-decoration: none;">
+        {% if news.thumb %}
+            <img style="min-height: 238px" src="{{ news.thumb }}" class="card-img-top">
+        {% endif %}
+        <div class="card-body">
+            <p style="font-size: 18px" class="text-dark text-truncate font-weight-bold">{{ news.title }}</p>
+            <p class="text-muted">{{ news.created_on }}</p>
+        </div>
+    </a>
+</div>

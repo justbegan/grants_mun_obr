@@ -1,0 +1,47 @@
+{% load auth_extras %}
+
+<p></p>
+<h4>Замечания</h4>
+
+
+{% comment %} {{project.organization.checklist}} {% endcomment %}
+
+
+<table class="table table-hover table-sm">
+<tr>
+    <th width="400px">Критерий</th>
+    <th>Соответствие</th>
+    <th>Примечание</th>
+</tr>
+{% for x in project.organization.checklist %}
+<tr>
+    <td>[{{x.id}}] {{x.criteria|linebreaksbr}}</td>
+    <td>
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio" class="custom-control-input" 
+          id="checklist-{{x.id}}-1" name="checklist_val-{{x.id}}" 
+          value="1" {% if x.value == True %}checked{% endif %} >
+        <label class="custom-control-label" for="checklist-{{x.id}}-1">Соответствует</label>
+      </div>
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio" class="d-negative custom-control-input" 
+          id="checklist-{{x.id}}-0" name="checklist_val-{{x.id}}" 
+          value="0" {% if x.value == False %}checked{% endif %} >
+        <label class="custom-control-label" for="checklist-{{x.id}}-0">Не соответствует</label>
+      </div>
+    </td>
+    <td>
+      <textarea class="form-control1" rows="3" name="checklist_comment-{{x.id}}" >{{x.comment}}</textarea>
+    </td>
+    {% comment %} <td>{{ project.organization.kpp|if_empty:"Не заполнено" }}</td> {% endcomment %}
+</tr>
+{% endfor %}
+</table>
+
+<style>
+.d-negative.custom-control-input:checked ~ .custom-control-label::before {
+  color: #fff;
+  border-color: #ff3239;
+  background-color: #ff3239;
+}
+</style>

@@ -1,0 +1,108 @@
+{% verbatim %}
+
+
+  <p class="text-center main_label"><b>Банковские реквизиты</b></p>
+  <label for="exampleInputEmail1"><h6 class="control-label">Расчетный счет</h6> <p style="margin-bottom: -10px; margin-top: -5px;">Укажите 20-значный номер счета для получения гранта</p></label>
+  
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input0" v-model="contract_json.c_checking_account" required>
+ 
+  <label for="exampleInputEmail1" class="control-label">Банковский идентификационный код (БИК)</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input1" v-model="contract_json.c_bik" required>
+ 
+  <label for="exampleInputEmail1" class="control-label">Название банка</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input2" v-model="contract_json.c_bank_name" required>
+ 
+  <label for="exampleInputEmail1">Корреспондентский счет</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input3" v-model="contract_json.c_correspondent_account">
+  
+  <p class="text-center main_label"><b>Выписка из ЕГРЮЛ</b></p>
+
+  Посмотреть актуальную выписку из ЕГРЮЛВы можете ознакомиться со сведениями о Вашей организации, содержащимися в ЕГРЮЛ, для проверки достоверности информации на этой странице.
+
+  <p class="text-center main_label"><b>Реквизиты организации</b></p>
+  <label for="exampleInputEmail1">Тип получателя софинансирования</label>
+  <select class="form-select" aria-label="Default select example" v-model="contract_json.c_recipient_type">
+
+    <option value="" selected disabled>Выберите значение</option>
+    <option value="1">Региональный оператор(некоммерческая организация)</option>
+    <option value="2">Уполномоченный орган(орган исполнитльной власти субъекта РФ)</option>
+   
+  </select>
+  
+ 
+  <label for="exampleInputEmail1" class="control-label">ОГРН</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input5" v-model="contract_json.c_ogrn" required>
+ 
+  <label for="exampleInputEmail1" class="control-label">Полное наименование организации</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input6" v-model="contract_json.c_full_org_name" required>
+ 
+  <label for="exampleInputEmail1">Сокращенное наименование организации</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input7" v-model="contract_json.c_short_org_name">
+ 
+  <label for="exampleInputEmail1" class="control-label">Юридический адрес</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input8" v-model="contract_json.c_jur_adress" required>
+ 
+  <label for="exampleInputEmail1" class="control-label">Фактический адрес</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input9" v-model="contract_json.c_fact_adress" required>
+ 
+  <label for="exampleInputEmail1" class="control-label">ИНН</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input10" v-model="contract_json.c_inn" required>
+
+  <label for="exampleInputEmail1" class="control-label">КПП</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input11" v-model="contract_json.c_kpp" required>
+
+  <label for="exampleInputEmail1" >Телефон</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="contract_json.c_tel">
+
+  <label for="exampleInputEmail1">Адрес электронной почты</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="contract_json.c_mail">
+
+  <p class="text-center main_label"><b>Лицо, подписывающее документ</b></p>
+
+  <label for="exampleInputEmail1" class="control-label">Фамилия</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="contract_json.c_f_name" required>
+  
+  <label for="exampleInputEmail1" class="control-label">Имя</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="contract_json.c_s_name" required>
+
+  <label for="exampleInputEmail1" class="control-label">Отчество</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="contract_json.c_m_name" required>
+
+  <label for="exampleInputEmail1" class="control-label">Должность</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="contract_json.c_position" required>
+
+  <label for="exampleInputEmail1" class="control-label">Действует на основании</label>
+  <select class="form-select" aria-label="Default select example"  v-model="contract_json.c_operates_on_the_basis" required>
+    
+    <option selected disabled value="">Выберите один из вариантов</option>
+    <option value="1">Устава</option>
+    <option value="2">Доверенности</option>
+    <option value="3">Иного документа</option>
+   
+  </select>
+
+  <label for="exampleInputEmail1" class="control-label">Документ</label>
+  <input style="margin-top: 2px;" type="file" class="form-control" placeholder="Введите данные" value="" id="c_pdf_file" @change="uploadFile" ref="file">
+  
+  <label for="exampleInputEmail1" class="control-label">Наименование документа в родительном падеже</label>
+  <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="contract_json.c_pdf_file_name" required>
+
+
+  <label for="exampleInputEmail1" class="control-label">Заявка</label>
+  <select class="form-select" aria-label="Default select example"  required v-model="contract_json.c_statement">
+    
+    <option selected disabled value="">Выберите один из вариантов</option>
+    <option v-for="item in statements" v-bind:value="item.id">
+      {{ item.title }}
+   </option>
+   
+  </select>
+
+  <button class="btn btn-dark pull-right">Создать Договор</button>
+
+ 
+  
+
+
+
+{% endverbatim %}

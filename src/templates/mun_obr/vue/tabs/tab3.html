@@ -1,0 +1,88 @@
+{% verbatim %}
+
+<div class="form-group">
+
+    <h7>Процент заполнения</h7>
+  <!--Процент заполнения-->
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" v-bind:style="{width:perc_contract}" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">{{percent_off_letter}}%</div>
+    </div>
+  <!--Процент заполнения end-->
+
+    <form v-on:submit.prevent="onSubmit" ref="my_input">
+
+ 
+  <label for="exampleInputEmail1" class="control-label">МР/ГО</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label">Размер собственного финансирования, руб.</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+
+  <label for="exampleInputEmail1" class="control-label">Размер запрашиваемой суммы, руб.</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label">Размер софинансирования из внебюджетных источников, руб.</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label">ОГРН получателя софинансирования, указанного в письме</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label">Должность</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label">Фамилия</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label">Имя</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label">Отчество</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label">Контактный телефон</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label">Адрес электронной почты</label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+
+  <label for="exampleInputEmail1" class="control-label"></label>
+  <input type="number" class="form-control" placeholder="Введите данные" value="" id="input" v-model="create_st_off_letter" required>
+ 
+ 
+
+  <button class="btn btn-dark pull-right">Создать письмо</button>
+
+ </form>
+  </div>
+
+</div>
+
+{% endverbatim %}

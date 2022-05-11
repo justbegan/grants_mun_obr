@@ -1,0 +1,241 @@
+{% load filter %}
+
+<table class="table table-hover table-sm" id="costs-table">
+    <thead>
+    <tr>
+        <th rowspan="2">№</th>
+        <th rowspan="2">Наименование показателя</th>
+        <th rowspan="2">Количество единиц</th>
+        <th rowspan="2">Стоимость единицы, рубль</th>
+        <th rowspan="2">Общая стоимость, рубль</th>
+        <th colspan="2">Средства гранта Главы РС(Я), рубль</th>
+        <th rowspan="2">Расходные документы</th>
+    </tr>
+    <tr>
+        <th>План</th>
+        <th>Факт</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for t in expense_types %}
+        <tr class="expense-type" data-type="{{ t.0 }}">
+            <td>{{ t.0 }}</td>
+            <td>{{ t.1 }}</td>
+            <td>x</td>
+            <td>x</td>
+            <td>x</td>
+            <td>x</td>
+            <td>x</td>
+            <td>x</td>
+        </tr>
+        {% with es=expenses|get_item:t.0 %}
+            {% for expense in es %}
+                <tr data-id="{{ expense.id|safe }}">
+                <td>{{ t.0 }}.{{ forloop.counter}}</td>
+                {% if is_admin_form %}
+                    <td>
+                        <textarea name="name" maxlength="255" class="form-control">{{ expense.name }}</textarea>
+                        {% if is_admin_form %}<span class="field-delete" data-expense="{{ expense.id|safe }}">удалить</span>{% endif %}
+                    </td>
+                    <td class="qty-td"><input type="text" value="{{ expense.qty|default_if_none:''|safe }}" name="qty" style="width: 120px" /></td>
+                    <td class="unit_cost-td"><input type="text" value="{{ expense.unit_cost|default_if_none:''|safe }}" name="unit_cost" style="width: 120px" /></td>
+                    <td class="overall-td"><span>{{ expense.overall|default_if_none:'' }}</span><input type="text" value="{{ expense.overall|default_if_none:''|safe }}" name="overall" style="width: 120px" /></td>
+                    <td><input type="text" value="{{ expense.planned|default_if_none:''|safe }}" name="planned" style="width: 120px" /></td>
+                {% else %}
+                    <td>{{ expense.name }}</td>
+                    <td>{{ expense.qty|default_if_none:'' }}</td>
+                    <td>{{ expense.unit_cost|default_if_none:'' }}</td>
+                    <td>{{ expense.overall|default_if_none:'' }}</td>
+                    <td>{{ expense.planned|default_if_none:'' }}</td>
+                {% endif %}
+                {% if is_user_form %}
+                    <td><input type="text" value="{{ expense.value|default_if_none:''|safe }}" name="value" style="width: 120px" /></td>
+                {% else %}
+                    <td>{{ expense.value|default_if_none:'' }}</td>
+                {% endif %}
+                <td class="reporting-links" data-type="costs">
+                    <a href="javascript:void(0)" data-type="doc">Расходные документы</a> {{ expense.files.count }}
+                    <div style="display: none" class="doc-w">
+                        {% if not expense.files.all %}
+                            <p>Нет документов.</p>
+                        {% else %}
+                            <ol>
+                                {% for p in expense.files.all %}
+                                    <li>
+                                        <a href="{{ p.file.url }}" target="_blank">{{ p.get_name }}</a>
+                                        {% if is_user_form %}<span class="file-delete" data-file="{{ p.id|safe }}" data-expense="{{ expense.id|safe }}">удалить</span>{% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        {% endif %}
+                        {% if is_user_form %}
+                            <form method="post" enctype="multipart/form-data">
+                                <input type="file" multiple accept="application/pdf" name="file">
+                                <input name="type" value="file" type="hidden">
+                                <input name="expense" value="{{ expense.id|safe }}" type="hidden">
+                                <input name="file_type" value="z" type="hidden">
+                                <button class="btn btn-primary float-right" type="submit">Добавить</button>
+                                {% csrf_token %}
+                            </form>
+                        {% endif %}
+                    </div>
+                </td>
+                </tr>
+            {% endfor %}
+        {% endwith %}
+        {% if is_admin_form %}
+            <tr class="expense-type">
+                <td colspan="8"><button class="btn btn-secondary costs-add" data-action="save" data-type="{{ t.0 }}">Добавить</button></td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+{% if is_admin_form %}
+    <div style="" class="clearfix costs-buttons">
+        <button class="import btn btn-primary float-right" data-action="save">Сохранить изменения</button>
+    </div>
+{% endif %}
+{% if is_user_form %}
+    <div style="" class="clearfix costs-buttons">
+        <button class="import btn btn-primary float-right" data-action="user-save">Сохранить изменения</button>
+    </div>
+{% endif %}
+<div class="text-center">
+    <a href="?task=pdf&type=costs" class="import btn btn-warning">Сформировать отчёт</a>
+</div>
+
+<script>
+    $(function() {
+        const $b = $('#costs-table tbody');
+        const tpl = '<tr>\n' +
+            '        <td></td>\n' +
+            '        <td><textarea name="name" maxlength="255" class="form-control"></textarea></td>\n' +
+            '        <td class="qty-td"><input name="qty" type="text" style="width: 120px" /></td>\n' +
+            '        <td class="unit_cost-td"><input name="unit_cost" type="text" style="width: 120px" /></td>\n' +
+            '        <td class="overall-td"><span></span><input name="overall" type="text" style="width: 120px" /></td>\n' +
+            '        <td><input name="planned" type="text" style="width: 120px" /></td>\n' +
+            '        <td></td>\n' +
+            '        <td></td>\n' +
+            '    </tr>';
+        let ajax = false;
+
+        $('.costs-add').on('click', function () {
+            $(this).parent().parent().before($(tpl).data('type', $(this).data('type')));
+        });
+
+        $('.costs-buttons button').on('click', function () {
+            switch ($(this).data('action')) {
+                case 'save':
+                    saveExpenses(false);
+                    break;
+                case 'user-save':
+                    saveExpenses(true);
+                    break;
+            }
+        });
+
+        function saveExpenses (isUser) {
+            const d =[];
+            $b.children().each(function () {
+                const $t = $(this);
+                if (!$t.hasClass('expense-type')) {
+                    const id = $t.data('id') ? $t.data('id') : null;
+                    if (isUser) {
+                        const z = $t.find('input');
+                        const val = z.eq(0).val().replaceAll(' ', '').trim();
+                        d.push({
+                            'id': id,
+                            'value': val ? val : null
+                        });
+                    } else {
+                        const t = $t.find('textarea[name=name]').val().trim();
+                        if (t.length || id) {
+                            const z = $t.find('input');
+                            const qty = z.eq(0).val().replaceAll(' ', '').trim();
+                            const uc = z.eq(1).val().replaceAll(' ', '').trim();
+                            const ov = z.eq(2).val().replaceAll(' ', '').trim();
+                            const pl = z.eq(3).val().replaceAll(' ', '').trim();
+                            d.push({
+                                'type': $(this).data('type'),
+                                'id': id,
+                                'name': t,
+                                'qty': qty ? qty : null,
+                                'unit_cost': uc ? uc : null,
+                                'overall': ov ? ov : null,
+                                'planned': pl ? pl : null
+                            });
+                        }
+                    }
+                }
+            });
+            if (!ajax) {
+                ajax = true;
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        csrfmiddlewaretoken: csrf,
+                        costs_json: JSON.stringify(d),
+                        type: 'costs',
+                        isUser: isUser
+                    },
+                    success: function (r) {
+                        console.log(r);
+                        //ajax = false;
+                        window.location.reload();
+                        //window.location.href = window.location.href;
+                    },
+                    error: function () {
+                        ajax = false;
+                        customMsg('Не удалось сохранить изменения', true);
+                    }
+                });
+            }
+        }
+
+        function numberWithSpaces(x) {
+            let parts = x.toString().replaceAll(' ', '').replaceAll(',', '').split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+            return parts.join(".");
+        }
+
+        {% if is_admin_form %}
+        function updateOverall($tr) {
+            const qtyVal = $tr.find('.qty-td input').val().replaceAll(' ', '');
+            const qty = parseInt(qtyVal);
+            const ucVal = $tr.find('.unit_cost-td input').val().replaceAll(' ', '');
+            const uc = parseFloat(ucVal);
+            //console.log(qty);
+            //console.log(uc);
+            if (!isNaN(qty) && !isNaN(uc)) {
+                const o = (qty * uc).toPrecision(12);
+                //console.log(o);
+                $tr.find('.overall-td span').text(numberWithSpaces(Number(o).toFixed(2)));
+                $tr.find('.overall-td input').val(o);
+            }
+        }
+        {% else %}
+        function updateOverall() {}
+        {% endif %}
+
+        function updateInputValues() {
+            $('#costs-table tr input[type=text]').each(function() {
+                if ($(this).val()) {
+                    $(this).val(numberWithSpaces($(this).val()));
+                }
+            });
+        }
+
+        {% comment %}const rgx = /^[0-9]*\.?[0-9]*$/;
+        $('#costs-table tr input[type=text]').on('keydown', function () {
+            $(this).val($(this).val().replaceAll(rgx, ''));
+        });{% endcomment %}
+
+        $('#costs-table tr input[type=text]').on('keyup', function () {
+            updateInputValues();
+            updateOverall($(this).parent().parent());
+        });
+
+        updateInputValues();
+    });
+</script>

@@ -1,0 +1,14 @@
+{% load crispy_forms_tags %}
+{% load auth_extras %}
+
+
+<form action="" method="post" id="score-sheet-form">
+    {% csrf_token %}
+    {% include "expert/organization-checklist.html" %}
+
+    <div class="text-center my-2">
+      <input type="submit" name="save" value="Сохранить" class="btn btn-primary"/>
+      {% comment %} <input type="submit" name="approve" value="Подтвердить" id="btn-approve" class="btn btn-primary" /> {% endcomment %}
+    </div>
+
+</form>

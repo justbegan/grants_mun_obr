@@ -1,0 +1,56 @@
+{% extends "base.html" %} 
+{% block content %}
+
+    <div class="container pt-4 pt-md-5">
+
+        <form method="get" class="form-inline float-right d-none d-md-block">
+            <div class="form-group">
+                <input class="form-control" name="q" type="text" placeholder="Поиск" value="{{ request.GET.q }}" />
+                <button type="submit" class="btn btn-primary ml-3">Искать</button>
+            </div>
+        </form>
+
+        <h1 class="mb-4 d-none d-md-block">
+            Часто задаваемые вопросы
+        </h1>
+        <h3 class="mb-4 d-block d-md-none text-center">
+            Часто задаваемые вопросы
+        </h3>
+
+        <form  method="get" class="d-block d-md-none">
+            <div class="form-group">
+                <input class="form-control" name="q" type="text" placeholder="Поиск" value="{{ request.GET.q }}" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Искать</button>
+        </form>
+
+        <div class="accordion pt-3">
+            {% for faq in faq_list %}
+                <div>
+                    <h3>
+                        <button class="btn btn-link text-left" type="button" data-toggle="collapse" data-target="#faq{{ faq.id }}">
+                            {{ faq.question }}
+                        </button>
+                    </h3>
+                    <div id="faq{{ faq.id }}" class="collapse">
+                        <div class="ml-3">{{ faq.answer | linebreaks }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-4">
+            {% include '_pager.html' with page_obj=page_obj %}
+        </div>
+
+    </div>
+
+    <script>
+        $(function() {
+            $('.faq-item a').on('click', function() {
+                $(this).next().toggle();
+            });
+        });
+    </script>
+
+{% endblock %}

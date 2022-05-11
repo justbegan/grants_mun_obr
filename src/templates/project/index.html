@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+    {% load crispy_forms_tags %}
+    <style>
+    .linkSpanner {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+    </style>
+    <div class="container pt-4 pt-md-5">
+        <h1 class="mb-4 d-none d-md-block">
+            Проекты
+        </h1>
+        <h3 class="mb-4 d-block d-md-none text-center">
+            Проекты
+        </h3>
+        <div class="row">
+            <div class="col-md-9">
+                {% for project in projects %}
+                    <div class="card mb-4 project-card">
+                        <div class="card-body row">
+                            <div class="col-sm-7">
+                                <h3 class="card-title">{{ project.title }}</h3>
+                                <p>{{ project.contest.title }}</p>
+                                <p>{{ project.direction.title }}</p>
+                            </div>
+                            <div class="col-sm-5">
+                                <h3 class="card-title">{{ project.budget_sum }} ₽</h3>
+                                <p class="card-text text-muted h6">Расходы на реализацию</p>
+                                <p class="card-text text-muted h3">{{ project.budget_request_sum }} ₽ </p>
+                                {% if project.status == project.NEW %}
+                                    Подана
+                                {% elif project.status == project.ON_CHECK %}
+                                    На проверке
+                                {% elif project.status == project.REJECT %}
+                                    Отклонена
+                                {% elif project.status == project.ON_EXAM %}
+                                    На экспертизе
+                                {% elif project.status == project.WIN %}
+                                    Победитель конкурса
+                                {% elif project.status == project.NOT_WIN %}
+                                    Проект, не получивший поддержку
+                                {% endif %}
+                                <h3 class="card-text text-muted h6">Заявка {{ project.id }}
+                                    от
+                                    {% if project.request_date %}
+                                        {{ project.request_date|date:"d E Y" }}
+                                    {% else %}
+                                        {{ project.created_on|date:"d E Y" }}
+                                    {% endif %}
+                                </h3>
+                            </div>
+                        </div>
+                        <a href="{% url 'project-view' project.id %}">
+                            <span class="linkSpanner"></span>
+                        </a>
+                    </div>
+                {% endfor %}
+
+                {% include '_pager.html' with page_obj=projects %}
+            </div>
+            <div class="col-md-3">
+                <form method="get">
+                    <div>
+                        <h6>ИНН организации</h6>
+                        {{ filter.form.organization__inn|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>ОГРН организации</h6>
+                        {{ filter.form.organization__ogrn|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>Название организации</h6>
+                        {{ filter.form.organization__short_name|as_crispy_field }}
+                    </div>
+                     <div>
+                        <h6>Район организации</h6>
+                        {{ filter.form.organization__geography__name|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>№ Проекта</h6>
+                        {{ filter.form.id|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>Название проекта</h6>
+                        {{ filter.form.title|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>Статус</h6>
+                        {{ filter.form.status|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>Грантовое направление</h6>
+                        {{ filter.form.direction|as_crispy_field }}
+                    </div>
+                    <div>
+                        <h6>Конкурс</h6>
+                        {{ filter.form.contest|as_crispy_field }}
+                    </div>
+                    <input type="submit" value="Применить" class="btn btn-outline-dark btn-block"/>
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

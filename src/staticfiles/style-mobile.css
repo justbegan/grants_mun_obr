@@ -1,0 +1,9 @@
+@media(max-width: 768px) {
+    .i-materials {
+        height: 380px;
+    }
+
+    .i-materials-title {
+        padding-top: 82px;
+    }
+}

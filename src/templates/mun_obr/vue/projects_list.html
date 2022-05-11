@@ -1,0 +1,64 @@
+{% verbatim %} 
+
+
+
+
+<div v-if="projects_tab_views == 'one'">
+
+
+
+    <ul class="nav nav-tabs" id="myTab2" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="statement_tab" data-toggle="tab" href="#statement" role="tab" aria-controls="statement" aria-selected="true">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="contract_tab" data-toggle="tab" href="#contract" role="tab" aria-controls="contract" aria-selected="false">Profile</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="statement" role="tabpanel" aria-labelledby="statement_tab">
+
+            {% endverbatim %}  
+
+            {% include "mun_obr/vue/projects_list_tabs/tab1.html" %}
+
+            {% verbatim %} 
+
+
+        </div>
+        <div class="tab-pane fade" id="contract" role="tabpanel" aria-labelledby="contract_tab">
+            {% endverbatim %}  
+
+            {% include "mun_obr/vue/projects_list_tabs/tab2.html" %}
+
+            {% verbatim %} 
+        </div>
+        
+      </div>
+    
+    
+
+</div>
+
+
+<div v-else>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">№</th>
+          <th scope="col">Название</th>
+          <th scope="col">Сумма</th>
+          <th scope="col">Дата</th>
+        </tr>
+      </thead>
+      <tbody v-for="(value, key, index) in projects_json">
+        <tr v-on:click="open_project($event,value.ID)" :value="value.ID">
+          <th scope="row">{{key + 1}}</th>
+          <td>{{value.Название}}</td>
+          <td>Otto</td>
+          <td>@mdo</td>
+        </tr>
+      </tbody>
+      </table>
+</div>
+{% endverbatim %} 

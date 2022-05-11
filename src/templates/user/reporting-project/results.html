@@ -1,0 +1,57 @@
+
+
+{% if project.get_check_results %}
+    <ol>
+        {% for a in project.get_check_results %}
+            <li>
+                <a href="{{ a.file.url }}" target="_blank">{{ a.title }}</a>
+            </li>
+        {% endfor %}
+    </ol>
+{% else %}
+    Нет файлов.
+{% endif %}
+
+
+{% if is_admin_form %}
+    <br><br>
+    <br><br>
+    <h5>Добавить итог проверки</h5>
+    <form enctype="multipart/form-data" method="post" action="/user/agreements-project/{{ project.id|safe }}" class="not-ajax">
+        <div class="form-row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Наименование</label>
+                    <input type="text" class="form-control" maxlength="500" name="title" required>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col">
+                <div class="form-group">
+                    <label>Номер</label>
+                    <input type="text" class="form-control" name="number" maxlength="50" required>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label>Дата подписания</label>
+                    <input type="text" class="form-control jq-dt" name="date" required>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col">
+                <div class="form-group">
+                    <label>Файл</label>
+                    <input type="file" name="file" required>
+                </div>
+            </div>
+            <div class="col text-right">
+                <button class="btn btn-primary" type="submit">Загрузить</button>
+            </div>
+        </div>
+        <input name="type" type="hidden" value="results">
+        {% csrf_token %}
+    </form>
+{% endif %}

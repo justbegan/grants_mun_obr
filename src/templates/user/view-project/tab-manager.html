@@ -1,0 +1,144 @@
+{% load auth_extras %}
+
+<table class="table table-hover table-sm">
+<tr>
+    <td width="400px">Должность руководителя проекта в организации-заявителе:</td>
+    <td>{{project.manager.position|if_empty:"Не заполнено"}}</td>
+</tr>
+<tr>
+    <td> ФИО руководителя проекта:</td>
+    <td>
+        {% if project.manager.last_name and project.manager.first_name and project.manager.middle_name%} 
+            {{project.manager}}
+        {% else %}
+            Не заполнено
+        {% endif %}
+    </td>
+</tr>
+<tr>
+    <td width="400px">Рабочий телефон:</td>
+    <td>{{project.manager.work_phone|if_empty:"Не заполнено"}}</td>
+</tr>
+<tr>
+    <td width="400px">Мобильный телефон:</td>
+    <td>{{project.manager.mobile_phone|if_empty:"Не заполнено"}}</td>
+</tr>
+<tr>
+    <td width="400px">Рабочий телефон:</td>
+    <td>{{project.manager.work_phone|if_empty:"Не заполнено"}}</td>
+</tr>
+<tr>
+    <td width="400px">Электронная почта:</td>
+    <td>{{project.manager.email|if_empty:"Не заполнено"}}</td>
+</tr>
+
+<tr>
+    <td>Образование:</td>
+    <td>{{project.manager.get_education_display|if_empty:"Не заполнено"}}</td>
+</tr>
+
+<tr>
+    <td>Учёное звание, учёная степень руководителя проекта (если имеется):</td>
+    <td>{{project.manager.academic_rank|if_empty:"Не заполнено"}}</td>
+</tr>
+
+<tr>
+    <td>Образовательные организации и специальности:</td>
+    <td>
+        {% if not project.manager.educations %} Не заполнено {% endif %}
+    </td>
+</tr>
+
+ {% for institution in project.manager.educations %}
+<tr>
+    <td>Образовательная организация:</td>
+    <td>{{ institution.organization }}</td>
+</tr>
+<tr>
+    <td>Специальность:</td>
+    <td>{{ institution.position }}</td>
+</tr>
+<tr>
+    <td>Дата поступления:</td>
+    <td>{{ institution.start_date }}</td>
+</tr>
+<tr>
+    <td>Дата окончания:</td>
+    <td>{{ institution.finish_date }}</td>
+</tr>
+<tr>
+    <td></td>
+    <td>&nbsp;</td>
+</tr>
+{% endfor %}
+
+
+<tr>
+    <td>Опыт работы:</td>
+    <td>
+        {% if not project.manager.works %} Не заполнено {% endif %}
+    </td>
+</tr>
+
+ {% for institution in project.manager.works %}
+<tr>
+    <td>Организация:</td>
+    <td>{{ institution.organization }}</td>
+</tr>
+<tr>
+    <td>Должность:</td>
+    <td>{{ institution.position }}</td>
+</tr>
+<tr>
+    <td>Дата начала работы:</td>
+    <td>{{ institution.start_date }}</td>
+</tr>
+<tr>
+    <td>Дата окончания работы:</td>
+    <td>{{ institution.finish_date|default:"Работает по текущее время" }}</td>
+</tr>
+<tr>
+    <td></td>
+    <td>&nbsp;</td>
+</tr>
+{% endfor %}
+       
+<tr>
+    <td width="400px">Дополнительные сведения:</td>
+    <td>{{project.manager.info|if_empty:"Не заполнено"|linebreaks}}</td>
+</tr>
+
+<tr>
+    <td>Рекомендации, письма, отзывы, характеристики</td>
+    <td> 
+        {% if not project.manager_letter_files %} Не загружено {% endif %}
+        <ul>
+            {% for letter_file in project.manager_letter_files %}
+                <li><a href="/media/{{letter_file.file }}">{{ letter_file.file }}</a></li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+
+<tr>
+    <td width="400px">Дата рождения:</td>
+    <td>{{project.manager.birth_date|if_empty:"Не заполнено"}}</td>
+</tr>
+
+<tr>
+    <td>Фотография</td>
+    <td> 
+        {% if not project.manager_photo_files %} Не загружено {% endif %}
+        <ul>
+            {% for letter_file in project.manager_photo_files %}
+                <img src="/media/{{letter_file.file }}" width="100%">
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+
+<tr>
+    <td>Ссылка на профиль в социальных сетях</td>
+    <td>{{project.manager.social_links|if_empty:"Не заполнено"|urlize|linebreaks}}</td>
+</tr>
+</table>

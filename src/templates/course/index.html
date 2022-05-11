@@ -1,0 +1,23 @@
+{% extends "base.html" %} 
+{% block content %}
+
+    <div class="container mt-4">
+
+        <h3 class="mb-4">Онлайн-курсы</h3>
+
+        <div class="card-columns">
+            {% for course in course_list %}
+                <a href="{% url 'course_detail' course.pk  %}">
+                    <div class="card" style="box-shadow: 3px 3px 6px rgba(184, 184, 184, 0.22)">
+                        <img class="card-img-top" src="{{ course.img.url }}" alt="{{ course.title }}" />
+                        <div class="card-body">
+                            <p class="card-text">{{ course.title }}</p>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+<table class="documents-table">
+    <tbody>
+    {% for doc in documents %}
+        <tr>
+            <td>
+                {{ doc.file.name }}
+
+                <a class="materials-btn" href="{{ doc.file.url }}">Скачать</a>
+            </td>
+            <td>
+                {{ doc.title }}
+            </td>
+            <td>
+                {% for tag in doc.tags.all %}
+                    {{ tag.name }}
+                    <br>
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

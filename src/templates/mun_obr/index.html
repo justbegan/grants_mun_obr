@@ -1,0 +1,56 @@
+<br><br>
+<ul class="list-group">
+    <a href="{% url 'profile-home' %}"
+       class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'profile-home' %}active{% endif %}">Профиль</a>
+    <a href="{% url 'profile-notifies' %}"
+       class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'profile-notifies' %}active{% endif %}">
+        Уведомления
+        {% notifications_unread as unread_count %}
+        {% if unread_count %}
+            <span class="badge badge-pill badge-primary"> {{ unread_count }} </span>
+        {% endif %}
+    </a>
+    {% comment %}<a href="{% url 'account_change_password' %}"
+       class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'account_change_password' %}active{% endif %}">Сменить
+        пароль</a>{% endcomment %}
+    {% if not request.user|has_group:"expert" and not request.user|has_group:"admin"%}
+        <a href="{% url 'user-home' %}"
+           class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'user-home' %}active{% endif %}">
+            Мои проекты</a>
+        {% comment %}<a href="{% url 'user-report-list' %}"
+           class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'user-report-list' %}active{% endif %}">
+            Мои отчеты</a>{% endcomment %}
+    {% endif %}
+    {% if request.user|has_group:"expert" %}
+        <div class="list-group-item list-group-title">Эксперт</div>
+        <li class="list-group-item disabled"> Зарегистрирован<br>{{ request.user.date_joined|date:"j E Y г." }} </li>
+        <a href="{% url 'expert-home' %}"
+           class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'expert-home' %}active{% endif %}">Назначенные
+            мне проекты</a>
+        <a href="{% url 'expert-score-sheet-list' %}"
+           class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'expert-score-sheet-list' %}active{% endif %}">Мои
+            оценочные листы</a>
+        <a href="{% url 'expert-documents' %}"
+           class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'expert-documents' %}active{% endif %}">Документы</a>
+    {% endif %}
+
+    {% if request.user|has_group:"admin" %}
+        <div class="list-group-item list-group-title">Администратор</div>
+        <a href="{% url 'manage-home' %}"
+           class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'manage-home' %}active{% endif %}">Все
+            проекты</a>
+    {% endif %}
+    {% if request.user|has_group:"admin2" %}
+        <a href="{% url 'manage-score-sheet-list' %}"
+           class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'manage-score-sheet-list' %}active{% endif %}">Все
+            оценочные листы</a>
+        {% comment %}<a href="{% url 'manage-report-list' %}"
+           class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'manage-report-list' %}active{% endif %}">
+            Поступившие отчеты </a>{% endcomment %}
+        <a href="{% url 'manage-reporting-list' %}"
+           class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'manage-reporting-list' %}active{% endif %}">
+            Отчетность </a>
+    {%  endif %}
+
+</ul>
+<br><br>

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+    <style>
+        .card {
+            text-align: center;
+            margin-bottom: 16px;
+            min-height: 550px;
+        }
+
+        .boss {
+            min-height: 450px;
+        }
+    </style>
+    <div class="container">
+        <h3 class="site-heading mb-4">Координационная комиссия</h3>
+
+        <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+
+                <div class="row">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-6">
+                        <div class="card boss">
+                            <img class="card-img-top" src="/media/{{ boss.photo }}" alt="Photo">
+                            <div class="card-body">
+                                <h6>{{ boss.fio }}</h6>
+                                <p class="card-text">{{ boss.position }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3"></div>
+                </div>
+                <div class="col-sm-3"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for member in commission_list %}
+                <div class="col-sm-3">
+                    <div class="card ">
+                        <img class="card-img-top" src="/media/{{ member.photo }}" alt="Photo">
+                        <div class="card-body">
+                            <h6>{{ member.fio }}</h6>
+                            <p class="card-text">{{ member.position }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

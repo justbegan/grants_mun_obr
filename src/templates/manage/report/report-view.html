@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    {% load auth_extras %}
+    {% load crispy_forms_tags %}
+    {% load render_table from django_tables2 %}
+
+    <script src="{% static 'js/vue.js' %}"></script>
+    <script src="{% static 'js/vuejs-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/vuejs-datepicker-ru.js' %}"></script>
+    <script src="{% static 'js/vue-toasted.min.js' %}"></script>
+    <script src="{% static 'js/vue-js-modal.js' %}"></script>
+    <style>
+        .tabs > ul {
+            margin-left: -20px;
+        }
+
+        .tabs >
+        ul li {
+            vertical-align: top;
+            display: inline-block;
+            padding: 8px;
+            margin-right: 1px;
+            background: #f5fafe;
+
+        }
+
+        .tabs, ul a {
+            color: black;
+        }
+
+        .is-active {
+            background: #508E96 !important;
+        }
+
+        a .is-active {
+            color: white !important;
+        }
+
+        textarea {
+            width: 100%;
+        }
+
+        option {
+            width: 100px !important;
+        }
+
+        input:required, textarea:required {
+            border: 1px solid green;
+        }
+
+        input:required:invalid, textarea:required:invalid {
+            border: 1px solid red;
+            background: rgb(252, 217, 217);
+        }
+    </style>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                {% include "profile/side.html" %}
+            </div>
+            <div id="app" class="col-sm-10">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h2>Отчет по проекту № {{ report.project.id }}</h2>
+                        <h6>Название: <a
+                                href="{% url 'user-view-project' report.project.id %}">{{ report.project.title }}</a>
+                        </h6>
+                        <h6>Организация: {{ report.project.organization.short_name }}</h6>
+                    </div>
+                    <div class="col-sm-4">
+                        {% if report.status == report.NEW %}
+                            <a href="{% url 'manage-report-change-status' report.project.id report.APPROVED %}"
+                               class="btn primary btn-sm">Принять</a>
+                            <a href="{% url 'manage-report-change-status' report.project.id report.FIX %}"
+                               class="btn btn-info btn-sm">На доработку</a>
+                            <a href="{% url 'manage-report-change-status' report.project.id report.REJECT %}"
+                               class="btn btn-danger btn-sm">Отклонить</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <tabs :showsave="false" default="smeta">
+                    <tab id="smeta" name="Смета реализации проекта">
+                        <h5>Смета реализации проекта</h5>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Наименование расходов</th>
+                                <th scope="col">Количество единиц</th>
+                                <th scope="col">Стоимость единицы (руб.)</th>
+                                <th scope="col">Общая стоимость (руб.)</th>
+                                <th scope="col">Софинансирование (руб.)</th>
+                                <th scope="col">Запрашиваемая сумма (руб.)</th>
+                                <th width="100px"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in report.smeta %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.cost }}</td>
+                                    <td>{{ item.items_count }}</td>
+                                    <td>[[ {{ item.cost }} * {{ item.items_count }} ]]</td>
+                                    <td>{{ item.co_financing }}</td>
+                                    <td>[[ {{ item.cost }} * {{ item.items_count }} - {{ item.co_financing }}]]</td>
+                                    <td>
+
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="3"><b>Итого</b></td>
+                                <td><b>{{ report.smeta_cost_sum }}</b></td>
+                                <td><b>{{ report.smeta_co_finance_sum }}</b></td>
+                                <td><b>{{ report.smeta_request_sum }}</b></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </tab>
+                    <tab id="cost" name="Отчет о расходах">
+                        <h5>
+                            ОТЧЕТ о расходах, источником финансового обеспечения которых
+                            является субсидии из государственного
+                            бюджета на государственную поддержку социально
+                            ориентированных некоммерческих организаций
+                        </h5>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Дата заключения (подписания) соглашения:</label>
+                                {{ report.cost.agreement_date }}
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Номер соглашения:</label>
+                                {{ report.cost.agreement_number }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Размер предоставленной субсидии (руб.)</label>
+                                {{ report.cost.grant_sum }}
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Дата получения субсидии:</label>
+                                {{ report.cost.grant_date }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>
+                                    Общий объем расходов, источником
+                                    финансового обеспечения которых
+                                    является субсидия, в отчетном году
+                                    (руб.):</label>
+                                {{ report.cost.total_cost }}
+                            </div>
+                            <div class="col-sm-6">
+                                <br>
+                                <label>из них по целевому назначению (руб.):</label>
+                                {{ report.cost.total_cost_target }}
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Остаток субсидии на дату окончания срока реализации программы (проекта):</label>
+                                {{ report.cost.grant_balance }}
+
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Сумма субсидии, подлежащая возврату в государственный бюджет (руб.)</label>
+                                {{ report.cost.grant_return }}
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Виды деятельности, в том числе приоритетные направления, для осуществления
+                                    мероприятий,
+                                    по которым в отчетном году использовалась субсидия:</label>
+                                <div>
+                                    {{ report.cost.activities|linebreaks }}
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6">
+                            </div>
+                        </div>
+                        <hr>
+                        <label>
+                            Сведения о софинансировании социально ориентированной некоммерческой организацией-
+                            получателем субсидии реализации программы, для осуществления мероприятий которой
+                            предоставлена субсидия, за счет других источников в отчетном году
+                        </label>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">№ п/п</th>
+                                <th scope="col">Источники софинансирования расходов на реализацию программы</th>
+                                <th scope="col">Сумма расходов (рублей)</th>
+                                <th width="100px"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in report.cost.social_items %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.cost }}</td>
+                                    <td>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td></td>
+                                <td><b>Итого</b></td>
+                                <td><b>{{ report.cost_social_sum }}</b></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <hr>
+                        <label>
+                            Реестр расходов, источником финансового обеспечения которых является субсидия, за отчетный
+                            год
+                        </label>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">№ п/п</th>
+                                <th scope="col">Наименование (вид) расхода</th>
+                                <th width="140px" scope="col">Дата расхода</th>
+                                <th scope="col">Сумма расходов</th>
+                                <th scope="col">Документы, подтверждающие осуществление расходов</th>
+                                <th width="100px"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in report.cost.reestr_items %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.date }}</td>
+                                    <td>{{ item.cost }}</td>
+                                    <td>{{ item.documents }}</td>
+                                    <td>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td><b>Итого</b></td>
+                                <td><b>{{ report.cost_reestr_sum }}</b></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </tab>
+                    <tab id="result" name="Значения показателей результативности">
+                        <h5>
+                            ОТЧЕТ
+                            о достижении значений показателей результативности
+                            предоставления субсидии из государственного
+                            бюджета на государственную поддержку социально
+                            ориентированных некоммерческих организаций
+                        </h5>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label>Дата заключения (подписания) соглашения:</label>
+                                {{ report.result.agreement_date }}
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Номер соглашения:</label>
+                                {{ report.result.agreement_number }}
+
+                            </div>
+                        </div>
+                        <hr>
+                        <label>
+                            Сведения о достижении значений показателей результативности предоставления субсидии,
+                            установленных соглашением
+                        </label>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">№ п/п</th>
+                                <th scope="col">Показатель результативности, установленный соглашением</th>
+                                <th scope="col">Значение показателя, установленное соглашением</th>
+                                <th scope="col">Фактическое значение показателя</th>
+                                <th width="100px"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in report.result.success_items %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.plan_value }}</td>
+                                    <td>{{ item.fact_value }}</td>
+                                    <td>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </tab>
+                    <tab id="plan" name="Календарный план">
+                        <table class="table">
+                            <thead>
+                            <th width="38%">Мероприятие</th>
+                            <th width="12%">Дата начала</th>
+                            <th width="12%">Дата окончания</th>
+                            <th width="38%">Ожидаемые результаты</th>
+                            </thead>
+                            <tbody>
+                            {% for event in report.project.event_set.all %}
+                                <tr>
+                                    <td>{{ event.name }}</td>
+                                    <td>{{ event.start_date }}</td>
+                                    <td>{{ event.finish_date }}</td>
+                                    <td>{{ event.result }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <h6>Отчет по мероприятию</h6>
+                                        {{ event.report|default:""|linebreaks }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </tab>
+                </tabs>
+                <div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="{% static 'vue/tabs.js' %}"></script>
+
+    <script>
+        Vue.use(Toasted)
+        Vue.use(window["vue-js-modal"].default)
+
+        const app = new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+        });
+    </script>
+{% endblock %}
