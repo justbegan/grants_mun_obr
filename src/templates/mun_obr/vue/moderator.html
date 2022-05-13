@@ -1,0 +1,24 @@
+{% verbatim %} 
+
+
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">№</th>
+          <th scope="col">Название</th>
+          <th scope="col">Статус заявки</th>
+  
+        </tr>
+      </thead>
+      <tbody v-for="(value, key, index) in moderator_projects">
+        <tr v-on:click="" :value="value.id">
+          <th scope="row">{{key + 1}}</th>
+          <td>{{value.title}}</td>
+          <td>{{value.status}}</td>
+        
+        </tr>
+      </tbody>
+      </table>
+
+{% endverbatim %} 

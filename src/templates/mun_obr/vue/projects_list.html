@@ -47,16 +47,16 @@
         <tr>
           <th scope="col">№</th>
           <th scope="col">Название</th>
-          <th scope="col">Сумма</th>
-          <th scope="col">Дата</th>
+          <th scope="col">Статус заявки</th>
+  
         </tr>
       </thead>
       <tbody v-for="(value, key, index) in projects_json">
-        <tr v-on:click="open_project($event,value.ID)" :value="value.ID">
+        <tr v-on:click="open_project($event,value.id)" :value="value.id">
           <th scope="row">{{key + 1}}</th>
-          <td>{{value.Название}}</td>
-          <td>Otto</td>
-          <td>@mdo</td>
+          <td>{{value.title}}</td>
+          <td>{{value.status}}</td>
+        
         </tr>
       </tbody>
       </table>

@@ -17,7 +17,8 @@ urlpatterns = [
     path('api/get_contracts/<int:id>',views.Get_contracts.as_view()),
     path('api/create_statement',views.Create_statement.as_view()),
     path('api/create_contract',views.Create_contract.as_view()),
-    path('api/get_statements',views.Get_all_statements.as_view())
+    path('api/get_statements',views.Get_all_statements.as_view()),
+    path('api/get_all_projects',views.Get_all_projects.as_view()),
   
 
 ]

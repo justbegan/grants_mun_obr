@@ -21,7 +21,6 @@ new Vue({
           kpp:"",
           full_name_grantee:"",
           short_name_grantee:"",
-          short_name_grantee:"",
           d_f_name:"",
           d_s_name:"",
           d_m_name:"",
@@ -29,6 +28,7 @@ new Vue({
           d_phone:"",
           d_mail:"",
           d_amount_of_overdue_debt:"",
+          author:541
           
 
 
@@ -109,15 +109,20 @@ new Vue({
         projects_json:"",
 
         projects_list:"",
+        
 
+        // Для просмотра проектов
         contract_json:"",
+        statement_json:"",
           
         errors:"",
         
         
         // Проценты заполненности
         perc:"",
-        perc_contract:""
+        perc_contract:"",
+        // Для окна модератора
+        moderator_projects:""
 
     },
  
@@ -167,10 +172,22 @@ new Vue({
         this.projects_tab_views = "list"
       },
 
+      moderator_view:function(event){
 
+        //get projecs with status = На модерации
+        const vm = this
+         
+        axios.get('/mun_obr/api/get_all_projects').then(function(response){
+
+          vm.moderator_projects = response.data
+             
+        });
+
+
+      },
       open_project:function(event, project_id){
         const vm = this
-        // var d = this.projects_json
+       
         this.projects_tab_views= "one"
         
         axios.get('/mun_obr/api/get_contracts/'+ project_id).then(function(response){
@@ -180,11 +197,10 @@ new Vue({
         });
   
 
-
-
-        // this.projects_list = d.filter(function(val) {
-        // return val.ID == project_id;})[0]
-
+        var d = vm.projects_json
+        vm.statement_json = d.filter(function(val) {
+        return val.id == project_id;})[0]
+        
       },
 
 
@@ -242,46 +258,10 @@ new Vue({
 
       onSubmit (event) {
         
-
-      //  this.post_request = {
-
-      //   title:document.getElementById('input0').value,
-      //   requested_sum:document.getElementById('input1').value,
-      //   sum_expenses:document.getElementById('input2').value,
-      //   source:document.getElementById('input3').value,
-      //   link:document.getElementById('input4').value,
-      //   recipient_type:document.getElementById('input5').value,
-      //   ogrn:document.getElementById('input6').value,
-      //   egryl_info:document.getElementById('input7').value,
-      //   inn:document.getElementById('input8').value,
-      //   kpp:document.getElementById('input9').value,
-      //   full_name_grantee :document.getElementById('input10').value,
-      //   short_name_grantee:document.getElementById('input11').value,
-      //   author: this.profile_json.id
-      //   // director:document.getElementById('input12').value,
-      //   // director_position:document.getElementById('input13').value
        
-
-      //  }
-
-        //Simple POST request with a JSON body using fetch
-        // const requestOptions = {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json",
-        //           "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
-        // },
-        //   body: JSON.stringify(this.post_request)
-        // };
-        // fetch('/mun_obr/api/create_statement', requestOptions)
-        //   .then(response => response.json())
-        //   .then(data => (this.postId = data.id));
-       
-
         var form_data = new FormData();
 
-        for ( var key in this.create_st_contract ) {
-            form_data.append(key, this.create_st_contract[key]);
-          }
+     
 
         
 
@@ -291,18 +271,52 @@ new Vue({
             }
           
         
-          
-          // axios.post('/mun_obr/api/create_statement', form_data, {
-          //     headers: headers
-          //   })
-          //   .then(response => { 
-          //     console.log(response);
-          //   })
-          //   .catch(e => {
+
+          var form_type = event.srcElement.id
+
+          //для создания заявки
+          if(form_type == "form_statement"){
+
+            for ( var key in this.create_st ) {
+              form_data.append(key, this.create_st[key]);
+            }
+
+            axios.post('/mun_obr/api/create_statement', form_data, {
+              headers: headers
+            })
+            .then(response => { 
+              console.log(response);
+            })
+            .catch(e => {
               
-          //     this.errors = e.response.data
+              this.errors = e.response.data
             
-          //   })
+            })
+
+          }
+
+          //  Для создания контракта 
+          else if(form_type = "form_contract"){
+
+
+            for ( var key in this.create_st_contract ) {
+              form_data.append(key, this.create_st_contract[key]);
+            }
+            axios.post('/mun_obr/api/create_contract', form_data, {
+              headers: headers
+            })
+            .then(response => { 
+              console.log(response);
+            })
+            .catch(e => {
+              
+              this.errors = e.response.data
+            
+            })
+
+
+          }
+      
             
       // function extend(obj, src) {
       //     for (var key in src) {
@@ -314,17 +328,8 @@ new Vue({
       // var u = extend(this.create_st, this.create_st_contract)
       //console.log(u)
         
-          axios.post('/mun_obr/api/create_contract', form_data, {
-              headers: headers
-            })
-            .then(response => { 
-              console.log(response);
-            })
-            .catch(e => {
-              
-              this.errors = e.response.data
-            
-            })
+        
+      
 
 
       }

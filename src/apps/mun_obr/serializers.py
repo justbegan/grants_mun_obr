@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Statement
-        fields =  ['title','requested_sum', 'sum_expenses', 'source', 'link', 'recipient_type', 'ogrn', 'egryl_info', 'inn', 'kpp', 'full_name_grantee', 'short_name_grantee', 'director', 'director_position','author','file']
+        fields =  ['title','requested_sum', 'sum_expenses', 'source','tab_1_file_1', 'link', 'recipient_type', 'ogrn', 'egryl_info', 'inn', 'kpp', 'full_name_grantee', 'short_name_grantee', 'd_f_name','d_s_name','d_m_name','d_position','d_phone','d_mail','d_amount_of_overdue_debt','author','file']
     def to_representation(self, instance):
         self.fields['user'] =  UserSerializer(read_only=True)
         return super(ArticleSerializer, self).to_representation(instance)

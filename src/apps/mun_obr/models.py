@@ -7,12 +7,18 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Statement(models.Model):
+    status_choises = [
+        ('На модерации','На модерации'),
+        ('На доработке', 'На доработке'),
+        ('Проверка пройдена', 'Проверка пройдена'),
+    ]
 
     title = models.CharField("Название", max_length=255,blank=True)
     requested_sum = models.IntegerField("Запрашиваемая сумма гранта", max_length=255,blank=True, default=0)
     sum_expenses = models.IntegerField("Сумма расходов", max_length=255,blank=True,default=0)
     source = models.CharField("Источник (источники)", max_length=255,blank=True)
     #3 пункт
+    tab_1_file_1 = models.CharField("Файл 1", max_length=255,blank=True)
     link = models.CharField("Сайт в сети Интернет", max_length=255,blank=True)
     recipient_type = models.CharField("Тип получателя софинансирования", max_length=255,blank=True)
     ogrn = models.CharField("ОГРН", max_length=255,blank=True)
@@ -21,10 +27,16 @@ class Statement(models.Model):
     kpp = models.CharField("КПП", max_length=255,blank=True)
     full_name_grantee = models.CharField("Полное наименование получателя гранта", max_length=255,blank=True)
     short_name_grantee = models.CharField("Сокращенное наименование получателя", max_length=255,blank=True)
-    director = models.CharField("ФИО руководителя", max_length=255,blank=True)
-    director_position = models.CharField("ФИО руководителя", max_length=255,blank=True)
+    d_f_name = models.CharField("Имя руководителя", max_length=255,blank=True)
+    d_s_name = models.CharField("Фамилия руководителя", max_length=255,blank=True)
+    d_m_name = models.CharField("Отчество руководителя", max_length=255,blank=True)
+    d_position = models.CharField("Должность руководителя", max_length=255,blank=True)
+    d_phone = models.CharField("Телефон руководителя", max_length=255,blank=True)
+    d_mail = models.CharField("Почта руководителя", max_length=255,blank=True)
+    d_amount_of_overdue_debt = models.CharField("Сумма просроченной задолженности", max_length=255,blank=True)
     author = models.ForeignKey(User, verbose_name="Автор", on_delete=models.CASCADE, blank=True)
     file = models.FileField(upload_to='documents',max_length=100,blank=True)
+    status = models.CharField('Статус заявки',choices=status_choises,default="На модерации",max_length=100)
 
   
 

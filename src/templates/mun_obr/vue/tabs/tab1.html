@@ -10,7 +10,7 @@
     </div>
   <!--Процент заполнения end-->
 
-    <form v-on:submit.prevent="onSubmit" ref="my_input">
+    <form v-on:submit.prevent="onSubmit" ref="my_input" id="form_statement">
 
    
   <label for="exampleInputEmail1">Название</label>
@@ -85,7 +85,7 @@
   <label for="exampleInputEmail1">Файл</label>
   <input type="file" class="form-control" placeholder="Введите данные" value="" id="input13" @change="uploadFile" ref="file">
 
-  <button class="btn btn-dark pull-right">Создать письмо</button>
+  <button class="btn btn-dark pull-right" id="btn_create_statement">Создать письмо</button>
 
  </form>
   </div>

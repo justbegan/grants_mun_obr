@@ -137,8 +137,9 @@ class Get_projects(APIView):
   
     def get(self, request):
         user_id = request.user.id
-
-        return Response(self.get_verbose_name(user_id))
+        q = Statement.objects.filter(author_id=user_id).values()
+        return Response(q)
+        # return Response(self.get_verbose_name(user_id))
 
     def get_verbose_name(self,user_id):
         #Get verbose_name from model
@@ -148,6 +149,12 @@ class Get_projects(APIView):
         v_list = [i for i in Statement.objects.filter(author_id=user_id).values_list()]
 
         return [ dict(zip(verbose_names, i)) for i in v_list ]
+
+class Get_all_projects(APIView):
+    def get(self,request):
+
+        q = Statement.objects.filter(status="На модерации").values()
+        return Response(q)
 
 
 class Get_contracts(APIView):
