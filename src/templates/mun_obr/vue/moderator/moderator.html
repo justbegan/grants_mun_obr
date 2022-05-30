@@ -1,0 +1,74 @@
+{% verbatim %} 
+
+<div v-if="moderator_tab_views_list">
+
+
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">№</th>
+        <th scope="col">Название</th>
+        <th scope="col">Статус заявки</th>
+  
+      </tr>
+    </thead>
+    <tbody v-for="(value, key, index) in moderator_projects">
+      <tr v-on:click="open_moderator_project($event,value.id)" :value="value.id">
+        <th scope="row">{{key + 1}}</th>
+        <td>{{value.title}}</td>
+        <td>{{value.status}}</td>
+      
+      </tr>
+    </tbody>
+    </table>
+  
+  
+
+</div>
+
+
+<div v-else>
+
+  <ul class="nav nav-tabs" id="myTab2" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="statement_tab" data-toggle="tab" href="#statement" role="tab" aria-controls="statement" aria-selected="true">Заявка</a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" id="moder_chat_tab" data-toggle="tab" href="#moder_chat" role="tab" aria-controls="moder_chat" v-on:click="get_messeges" aria-selected="true">Диалог</a>
+    </li>
+ 
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="statement" role="tabpanel" aria-labelledby="statement_tab">
+
+        {% endverbatim %}  
+
+        {% include "mun_obr/vue/moderator/tab_statement.html" %}
+
+        {% verbatim %} 
+
+
+    </div>
+
+    <div class="tab-pane fade" id="moder_chat" role="tabpanel" aria-labelledby="moder_chat_tab">
+
+      {% endverbatim %}  
+
+      {% include "mun_obr/vue/moderator/dialog.html" %}
+
+      {% verbatim %} 
+
+
+  </div>
+
+    
+  </div>
+
+</div>
+
+
+
+
+{% endverbatim %} 

@@ -9,14 +9,18 @@
 
     <ul class="nav nav-tabs" id="myTab2" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" id="statement_tab" data-toggle="tab" href="#statement" role="tab" aria-controls="statement" aria-selected="true">Home</a>
+          <a class="nav-link active" id="statement_open_tab" data-toggle="tab" href="#statement_open" role="tab" aria-controls="statement_open" aria-selected="true">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" id="contract_tab" data-toggle="tab" href="#contract" role="tab" aria-controls="contract" aria-selected="false">Profile</a>
         </li>
+
+        <li class="nav-item">
+          <a class="nav-link" id="chat_tab" data-toggle="tab" href="#chat" role="tab" aria-controls="chat" aria-selected="false" v-on:click="get_messeges">Диалог с ответстенным лицом</a>
+        </li>
       </ul>
       <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="statement" role="tabpanel" aria-labelledby="statement_tab">
+        <div class="tab-pane fade show active" id="statement_open" role="tabpanel" aria-labelledby="statement_open_tab">
 
             {% endverbatim %}  
 
@@ -33,6 +37,15 @@
 
             {% verbatim %} 
         </div>
+
+
+        <div class="tab-pane fade" id="chat" role="tabpanel" aria-labelledby="chat_tab">
+          {% endverbatim %}  
+
+          {% include "mun_obr/vue/projects_list_tabs/tab3.html" %}
+
+          {% verbatim %} 
+      </div>
         
       </div>
     

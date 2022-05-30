@@ -19,6 +19,9 @@ urlpatterns = [
     path('api/create_contract',views.Create_contract.as_view()),
     path('api/get_statements',views.Get_all_statements.as_view()),
     path('api/get_all_projects',views.Get_all_projects.as_view()),
+    path('api/statement_update/<int:pk>',views.Create_statement.as_view()),
+    path('api/create_messege',views.Send_messeges.as_view()),
+    path('api/get_messeges/<int:id>',views.Send_messeges.as_view()),
   
 
 ]

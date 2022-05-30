@@ -1,0 +1,31 @@
+{% verbatim %}
+
+<label for="exampleInputEmail1">Сообщение</label>
+<textarea class="form-control" aria-label="With textarea" v-model="create_messege_json.messege"></textarea>
+<button class="btn btn-dark pull-right" id="moder_send_msg" v-on:click="create_messege">Отправить</button>
+
+<div v-for="(value, key, index) in chat_messeges">
+
+  <div v-if="value.author_id == profile_json.id">
+
+    <p class="text-end">Вы</p>
+    <textarea class="form-control ml-auto" aria-label="With textarea" style="width:300px" disabled>{{value.messege}}</textarea>
+    <p class="text-end">Время:{{value.create_time}}</p>
+  </div>
+  <div v-else>
+
+    <label for="exampleInputEmail1">Лицо</label>
+    <textarea class="form-control " aria-label="With textarea" style="width:200px" disabled>{{value.messege}}</textarea>
+    
+    <p v-if="value.user_file">
+      Файл: {{value.user_file}}<br>
+     <a :href="'http://localhost:8000/media/' + value.user_file"><img  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Edge-gtk-new.svg/120px-Edge-gtk-new.svg.png" alt=""></a> 
+
+    </p>
+    <p>Время:{{value.create_time}}</p>
+  </div>
+
+
+</div>
+  
+{% endverbatim %}

@@ -37,6 +37,7 @@ class Statement(models.Model):
     author = models.ForeignKey(User, verbose_name="Автор", on_delete=models.CASCADE, blank=True)
     file = models.FileField(upload_to='documents',max_length=100,blank=True)
     status = models.CharField('Статус заявки',choices=status_choises,default="На модерации",max_length=100)
+    comment = models.CharField('Комментарий',max_length=250,blank=True)
 
   
 
@@ -65,3 +66,23 @@ class Contract(models.Model):
     c_statement = models.ForeignKey(Statement,on_delete=models.CASCADE, blank=True,related_name='c_statementOf')
    
 
+class Messeges(models.Model):
+    create_time = models.DateTimeField('Дата добавления', auto_now_add=True)
+    messege = models.CharField(max_length=255,blank=True)
+    statement_id = models.ForeignKey(Statement,on_delete=models.CASCADE, blank=True,related_name='statement_chat')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, related_name='user')
+    user_file= models.FileField(upload_to='documents',blank=True)
+
+
+class Profile(models.Model):
+        #Муницыпальным образованиям 
+
+    mr_go_name = models.CharField("Наименование МР/ГО", max_length=255, blank=True)
+    main_fio = models.CharField("ФИО лица, имеющего право подписи без доверенности",max_length=255,blank=True)
+    sec_fio = models.CharField("ФИО ответственного специалиста по взаимодействию с уполномоченным органом", max_length=255, blank=True)
+    mail_jur = models.CharField("Адрес электронной почты для направления юридически значимых документов;", max_length=255, blank=True)
+    phone_2 = models.CharField("Контактный телефон", max_length=255, blank=True)
+    ogrn = models.CharField("ОГРН организации", max_length=255, blank=True)
+    inn = models.CharField("ИНН организации", max_length=255, blank=True)
+    jur_adrs = models.CharField("Юридический адрес", max_length=255, blank=True)
+    bank_data = models.CharField("Банковские реквизиты ", max_length=255, blank=True)

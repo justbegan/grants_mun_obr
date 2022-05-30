@@ -181,6 +181,20 @@ class Create_statement(APIView):
         
         return Response({"success": "Article"})
 
+    def put(self,request,*args,**kwargs):
+        pk = kwargs.get("pk",None)
+        if not pk:
+            return Response({"error":"pk not allowed"})
+        try:
+            instance = Statement.objects.get(pk=pk)
+        except:
+            return Response({"error":"objects does not excists"})
+
+        serializer = ArticleSerializer(data= request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"post":serializer.data})
+
 
 class Create_contract(APIView):
 
@@ -202,3 +216,26 @@ class Get_all_statements(APIView):
         s = Statement.objects.all()
         s = Statement_for_getSerializer(s, many=True)
         return Response(s.data)
+
+
+
+class Send_messeges(APIView):
+
+    def post(self, request):
+        messege = request.data
+        
+        serializer = MessegeSerializer(data=messege)
+       
+        if serializer.is_valid(raise_exception=True):
+            resp = serializer.save()
+            messege_id = serializer.data['id']
+
+            messege = Messeges.objects.filter(id=messege_id).values()
+            return Response({"success": messege[0]})
+        else:
+            return Response({"error":"error_this"})
+
+    def get(self, request,id):
+        statement = Statement.objects.get(id=id)
+        contract = statement.statement_chat.values().order_by('-id')
+        return Response(contract)
