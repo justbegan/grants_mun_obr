@@ -55,8 +55,25 @@ class Get_profile(APIView):
     def get(self, request):
         user_id = request.user.id
         #prof = Profile.objects.filter(id=user_id).values()
+
         prof = Mun_obr_profile.objects.filter(author_id=user_id).values()
-        return Response(prof)
+        if prof:
+            return Response(prof)
+        else:
+            context = [{
+                "mr_go_name":"",
+                "sec_fio":"",
+                "main_fio":"",
+                "mail_jur":"",
+                "phone_2":"",
+                "ogrn":"",
+                "inn":"",
+                "jur_adrs":"",
+                "bank_data":"",
+                "author_id":request.user.id
+            }]
+            print(context)
+            return Response(context)
 
 
 
@@ -69,7 +86,6 @@ class Mun_obr_profile_api(APIView):
         user_id = request.user.id
         c = Mun_obr_profile.objects.filter(author_id=user_id)
         serializer =Mun_obr_profileSerializer(data=s)
-        print()
         if not c:
             
         
