@@ -14,11 +14,11 @@ class Statement(models.Model):
     ]
 
     title = models.CharField("Название", max_length=255,blank=True)
-    requested_sum = models.IntegerField("Запрашиваемая сумма гранта", max_length=255,blank=True, default=0)
-    sum_expenses = models.IntegerField("Сумма расходов", max_length=255,blank=True,default=0)
+    requested_sum = models.BigIntegerField("Запрашиваемая сумма гранта",blank=True, default=0)
+    sum_expenses = models.BigIntegerField("Сумма расходов", blank=True,default=0)
     source = models.CharField("Источник (источники)", max_length=255,blank=True)
     #3 пункт
-    tab_1_file_1 = models.CharField("Файл 1", max_length=255,blank=True)
+    tab_1_file_1 = models.FileField("Файл 1", max_length=255,blank=True)
     link = models.CharField("Сайт в сети Интернет", max_length=255,blank=True)
     recipient_type = models.CharField("Тип получателя софинансирования", max_length=255,blank=True)
     ogrn = models.CharField("ОГРН", max_length=255,blank=True)
@@ -74,7 +74,7 @@ class Messeges(models.Model):
     user_file= models.FileField(upload_to='documents',blank=True)
 
 
-class Profile(models.Model):
+class Mun_obr_profile(models.Model):
         #Муницыпальным образованиям 
 
     mr_go_name = models.CharField("Наименование МР/ГО", max_length=255, blank=True)
@@ -86,3 +86,4 @@ class Profile(models.Model):
     inn = models.CharField("ИНН организации", max_length=255, blank=True)
     jur_adrs = models.CharField("Юридический адрес", max_length=255, blank=True)
     bank_data = models.CharField("Банковские реквизиты ", max_length=255, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, related_name='user_1')

@@ -2,7 +2,7 @@ from dataclasses import field
 from operator import mod
 from pyexpat import model
 from rest_framework import serializers
-from .models import Statement, Contract, Messeges
+from .models import Mun_obr_profile, Statement, Contract, Messeges
 from django.contrib.auth.models import User
 from rest_framework import exceptions
 
@@ -65,3 +65,9 @@ class MessegeSerializer(serializers.ModelSerializer):
         model = Messeges
         fields = ['id','messege','statement_id','author','user_file']
   
+class Mun_obr_profileSerializer(serializers.ModelSerializer):
+    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    class Meta:
+        model = Mun_obr_profile
+        fields =  '__all__'
+

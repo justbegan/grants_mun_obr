@@ -13,11 +13,15 @@
     <input type="number" class="form-control" placeholder="Введите данные" value="" id="input2" v-model="statement_json.sum_expenses">
    
     <label for="exampleInputEmail1">Источник (источники) финансового обеспечения таких расходов (без учета запрашиваемого гранта)</label>
-    <input type="text" class="form-control" placeholder="Введите данные" value="" id="input3" v-model="statement_json.source">
+    <input type="text" class="form-control" placeholder="Введите данные" value="" id="input3" v-model="v-model="statement_json.source"">
    
     <label for="exampleInputEmail1">Действующие редакции нормативных правовых актов субъекта Российской Федерации и иных документов, регулирующих оказание на конкурсной основе поддержки 
       некоммерческим неправительственным организациям в данном субъекте Российской Федерации.*</label>
-      <input type="file" class="form-control" placeholder="Введите данные" value="" id="tab_1_file_1" @change="uploadFile" ref="file">
+
+      
+      <a v-if="statement_json.tab_1_file_1 !=''" :href="'http://127.0.0.1:8000/media/'+ statement_json.tab_1_file_1">{{statement_json.tab_1_file_1}}</a>
+
+      <input type="file" class="form-control" id="tab_1_file_1" @change="uploadFile" ref="file">
     
    
     <label for="exampleInputEmail1">Сайт в сети Интернет, используемый заявителем для размещения информации и документов об оказании на конкурсной основе поддержки социально 

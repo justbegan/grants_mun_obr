@@ -41,19 +41,6 @@ class Profile(models.Model):
     organization = models.TextField("Место работы (организация)", blank=True, null=True)
     social = ArrayField(models.CharField("Социальная сеть", max_length=255), blank=True, null=True)
 
-    #Муницыпальным образованиям 
-
-    mr_go_name = models.CharField("Наименование МР/ГО", max_length=255, blank=True)
-    main_fio = models.CharField("ФИО лица, имеющего право подписи без доверенности",max_length=255,blank=True)
-    sec_fio = models.CharField("ФИО ответственного специалиста по взаимодействию с уполномоченным органом", max_length=255, blank=True)
-    mail_jur = models.CharField("Адрес электронной почты для направления юридически значимых документов;", max_length=255, blank=True)
-    phone_2 = models.CharField("Контактный телефон", max_length=255, blank=True)
-    ogrn = models.CharField("ОГРН организации", max_length=255, blank=True)
-    inn = models.CharField("ИНН организации", max_length=255, blank=True)
-    jur_adrs = models.CharField("Юридический адрес", max_length=255, blank=True)
-    bank_data = models.CharField("Банковские реквизиты ", max_length=255, blank=True)
-
-
     class Meta:
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'

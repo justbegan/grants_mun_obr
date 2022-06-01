@@ -28,7 +28,7 @@ new Vue({
           d_phone:"",
           d_mail:"",
           d_amount_of_overdue_debt:"",
-          author:541
+          author:""
           
 
 
@@ -56,8 +56,7 @@ new Vue({
           c_position:"",
           c_operates_on_the_basis:"",
           c_pdf_file:"",
-          c_pdf_file_name:"",
-          c_statement:2
+          c_pdf_file_name:""
 
 
 
@@ -130,7 +129,9 @@ new Vue({
         moderator_tab_views_list:true,
         moderator_statement:"",
         //Кон
-
+        //modal
+        modаl_messege:"",
+        //end modal
 
         //header json
         headers_json:{
@@ -155,21 +156,64 @@ new Vue({
 
 
     methods: {
+      
+      update_profile:function(){
+
+        const vm = this
+        
+        vm.profile_json.author = 541
+        console.log(vm.profile_json)
+        axios.post('/mun_obr/api/mun_obr_profile', vm.profile_json, {
+          headers: vm.headers_json
+        })
+        .then(response => { 
+
+          if(response.status >= 200 && response.status <= 226){
+
+          vm.get_modal("authModal","Профиль обновлен")
+          }
+          else{
+
+            vm.get_modal("auth_eModal","Ошибка")
+
+          }
+
+        })
+        .catch(e => {
+          
+          this.errors = e.response.data
+          vm.get_modal("auth_eModal","Ошибка")
+        
+        })
+
+
+      },
 
       //Обрабатывает загружаемые файлы
-      uploadFile(e) {
+      uploadFile(e,name) {
+
+            console.log(name)
             //get id
             var z = e.srcElement.id
             //get file
             var file = e.target.files[0]
-    
-            console.log(file)
-            console.log(z)
+            var model 
+
+            if(z=='tab_1_file_1'){
+
+              model = this.create_st
+
+            }
+            else{
+              model = this.create_st_contract
+            }
+
+
             //Валидация по размеру файла 2621440
             if (file.size > 10*1024*1024) {
               e.preventDefault();
               
-              this.create_st_contract[z] = null
+              model[z] = null
               
               // Показать modal
           
@@ -179,9 +223,10 @@ new Vue({
             
             else{
               //Прикрепить файл
-              this.create_st_contract[z] = file
+              model[z] = file
     
             } 
+            
 
             
       },
@@ -192,36 +237,18 @@ new Vue({
         document.getElementById("input10").value = this.profile_json.inn
  
       },
-  
+      // При открывании списка проектов
       projects(){
-        this.projects_tab_views = "list"
-      },
 
-      open_moderator_project:function(event,project_id){
         const vm = this
-        this.moderator_tab_views_list = false
-        var d = vm.moderator_projects
-        vm.moderator_statement = d.filter(function(val) {
-        return val.id == project_id;})[0]
-
+        vm.projects_tab_views = "list"
+        vm.get_projects()
 
       },
 
-      moderator_view:function(event){
-        this.moderator_tab_views_list = true
-        //get projecs with status = На модерации
-        const vm = this
-         
-        axios.get('/mun_obr/api/get_all_projects').then(function(response){
-
-          vm.moderator_projects = response.data
-             
-        });
 
 
-      },
-
-      // Для просмотра своих проектов
+      // Для открытия проекта
       open_project:function(event, project_id){
         const vm = this
        
@@ -240,24 +267,31 @@ new Vue({
         
       },
 
-    
+      for_test(){
+        const vm = this
+        console.log(vm.profile_json)
+
+      },
 
       onSubmit (event) {
         
-       
+        const vm = this
         var form_data = new FormData();
 
         var form_type = event.srcElement.id
-
+       
           //для создания заявки
           if(form_type == "form_statement"){
 
-            for ( var key in this.create_st ) {
-              form_data.append(key, this.create_st[key]);
+            for ( var key in vm.create_st ) {
+              form_data.append(key, vm.create_st[key]);
             }
+            //Добавление id автора
+            form_data.append('author',vm.profile_json.author_id)
+
 
             axios.post('/mun_obr/api/create_statement', form_data, {
-              headers: this.headers_form
+              headers: vm.headers_form
             })
             .then(response => { 
               
@@ -265,20 +299,22 @@ new Vue({
               if(response.status >= 200 && response.status <= 226){
 
              
-                // modal об успешном создании
-                var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
-                  keyboard: false
-                })
-                myModal.show()
+                vm.get_modal("authModal","Заявка успешно добавлена")
        
               
             } 
+
+            else{
+
+              vm.get_modal("auth_eModal","Ошибка, повторите попытку")
+
+            }
 
 
             })
             .catch(e => {
               
-              this.errors = e.response.data
+              vm.errors = e.response.data
             
             })
 
@@ -295,11 +331,23 @@ new Vue({
               headers: this.headers_form
             })
             .then(response => { 
-              console.log(response);
+              if(response.status >= 200 && response.status <= 226){
+
+             
+                vm.get_modal("authModal","Контракт успешно добавлен")
+       
+              
+            } 
+
+            else{
+
+              vm.get_modal("auth_eModal","Ошибка, повторите попытку")
+
+            }
             })
             .catch(e => {
               
-              this.errors = e.response.data
+              vm.get_modal("auth_eModal","Ошибка, повторите попытку")
             
             })
 
@@ -317,12 +365,22 @@ new Vue({
       // var u = extend(this.create_st, this.create_st_contract)
       //console.log(u)
         
-        
       
+      },
+
+      get_projects:function(e){
+
+        const vm = this
+
+        axios.get('/mun_obr/api/get_projects').then(function(response){
+
+          vm.projects_json = response.data
+          
+        });
 
 
       },
-
+      // Методы модератора
       moderator_update:function(event){
 
         const vm = this
@@ -344,11 +402,7 @@ new Vue({
           if(response.status >= 200 && response.status <= 226){
 
          
-            // modal об успешном создании
-            var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
-              keyboard: false
-            })
-            myModal.show()
+            vm.get_modal("authModal","Заявка обновлена")
    
           
         } 
@@ -362,6 +416,31 @@ new Vue({
         
         })
 
+
+
+      },
+
+      open_moderator_project:function(event,project_id){
+        const vm = this
+        this.moderator_tab_views_list = false
+        var d = vm.moderator_projects
+        vm.moderator_statement = d.filter(function(val) {
+        return val.id == project_id;})[0]
+
+
+      },
+
+
+      moderator_view:function(event){
+        this.moderator_tab_views_list = true
+        //get projecs with status = На модерации
+        const vm = this
+         
+        axios.get('/mun_obr/api/get_all_projects').then(function(response){
+
+          vm.moderator_projects = response.data
+             
+        });
 
 
       },
@@ -382,8 +461,6 @@ new Vue({
 
         }
 
-
-        console.log(statement_id)
         axios.put('/mun_obr/api/statement_update/'+ statement_id, form_data, {
           headers: vm.headers_form
         })
@@ -393,11 +470,7 @@ new Vue({
           if(response.status >= 200 && response.status <= 226){
 
          
-            // modal об успешном создании
-            var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
-              keyboard: false
-            })
-            myModal.show()
+            vm.get_modal("authModal","Заявка обновлена")
    
           
         } 
@@ -412,6 +485,8 @@ new Vue({
         })
 
       },
+
+
       get_messeges:function(event){
         
         
@@ -450,7 +525,7 @@ new Vue({
           statement_id = vm.statement_json.id
         }
         
-        vm.create_messege_json.author = vm.profile_json.id
+        vm.create_messege_json.author = vm.profile_json.author_id
         vm.create_messege_json.statement_id = statement_id
 
 
@@ -483,8 +558,25 @@ new Vue({
         var file = event.target.files[0]
         vm.create_messege_json.user_file = file
       
-      }
+      },
+
+
+      // Метод вызова модального окна
+      get_modal:function(type,text){
+            const vm = this
+            vm.modаl_messege = text
+            var myModal = new bootstrap.Modal(document.getElementById(type), {
+              keyboard: false
+            })
+            myModal.show()
+    
+    
+          }
+
+      
           },
+
+    
 
 
     computed: {
@@ -515,8 +607,8 @@ new Vue({
 
 
 
-            }
-
+            },
+         
 
 
 
@@ -528,15 +620,17 @@ new Vue({
       axios.get('/mun_obr/api/get_profile').then(function(response){
 
           vm.profile_json = response.data[0]
+ 
           
         });
 
       // Получение проектов
-      axios.get('/mun_obr/api/get_projects').then(function(response){
+      // axios.get('/mun_obr/api/get_projects').then(function(response){
 
-        vm.projects_json = response.data
+      //   vm.projects_json = response.data
         
-      });
+      // });
+      vm.get_projects()
 
      
       axios.get('/mun_obr/api/get_statements').then(function(response){

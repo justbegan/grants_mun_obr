@@ -53,16 +53,20 @@
 
 <body class="body fonts">
  
-  {% include "mun_obr/vue/modals.html"%}
+  
 
   {% csrf_token %}
   {% verbatim %}
     <div class="container-sm" style="margin-top: 5em;">
 
         <div id="vue_app">
-            <p class="text-center fs-2">Раздел «Муниципальным образованиям»</p>
-         
 
+          {% endverbatim %}
+          {% include "mun_obr/vue/modals.html"%}
+          {% verbatim %}
+            <p class="text-center fs-2">Раздел «Муниципальным образованиям»</p>
+            
+            <button v-on:click="for_test">для тестов</button>
             <div class="row">
               <div class="col-3" >
                  

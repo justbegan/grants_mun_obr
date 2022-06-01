@@ -12,8 +12,8 @@ from django.urls import reverse_lazy
 
 from .models import Statement
 from .serializers import *
+from rest_framework import status
 
-from .forms import UserForm, ProfileForm
 # Create your views here.
 class NewsList(generic.ListView):
     queryset = News.objects.order_by('-created_on').filter(for_munobr=True)
@@ -28,60 +28,6 @@ from rest_framework.viewsets import ModelViewSet
 
 
 
-
-def index(request):
-    # if request.method == 'POST':
-    #     user_form = UserForm(request.POST, instance=request.user)
-    #     profile_form = ProfileForm(request.POST, instance=request.user.profile)
-    #     if user_form.is_valid() and profile_form.is_valid():
-    #         user_form.save()
-    #         profile_form.save()
-    #         messages.success(request, 'Ваш профиль был успешно обновлен!')
-    #         return redirect('profile-home')
-    #     else:
-    #         messages.error(request, 'Пожалуйста, исправьте ошибки.')
-    # else:
-    #     user_form = UserForm(instance=request.user)
-    #     profile_form = ProfileForm(instance=request.user.profile)
-    # return render(request, 'profile/index.html', {
-    #     'user_form': user_form,
-    #     'profile_form': profile_form
-    # })
-
-    from allauth.account.views import PasswordChangeView
-    from allauth.account.forms import ChangePasswordForm
-    from allauth.account.utils import logout_on_password_change
-
-    if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(request.POST, instance=request.user.profile)
-        if request.POST.get('pwd'):
-            pwd_form = ChangePasswordForm(data=request.POST, user=request.user)
-            if pwd_form.is_valid():
-                v = PasswordChangeView.as_view(success_url=reverse_lazy('profile-home'))
-                # v.success_url = 'profile-home'
-                return v(request)
-                # logout_on_password_change(request, pwd_form.user)
-                # return redirect('profile-home')
-            else:
-                messages.error(request, 'Пожалуйста, исправьте ошибки.')
-        else:
-            if user_form.is_valid() and profile_form.is_valid():
-                user_form.save()
-                profile_form.save()
-                messages.success(request, 'Ваш профиль был успешно обновлен!')
-                return redirect('profile-home')
-            else:
-                messages.error(request, 'Пожалуйста, исправьте ошибки.')
-    else:
-        user_form = UserForm(instance=request.user)
-        profile_form = ProfileForm(instance=request.user.profile)
-        pwd_form = ChangePasswordForm(user=request.user)
-    return render(request, 'mun_obr/profile/index.html', {
-        'user_form': user_form,
-        'profile_form': profile_form,
-        'pwd_form': pwd_form
-    })
 
 
 def notifies(request):
@@ -104,33 +50,46 @@ def vue_test(request):
 
 
 
-
-class Main_app_serializers(ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = ['id','mr_go_name','main_fio','sec_fio','mail_jur','phone_2','ogrn','inn','jur_adrs','bank_data']
-
-class Statement_serializers(ModelSerializer):
-    class Meta:
-        model = Statement
-        fields = ['id','title','requested_sum', 'sum_expenses', 'source', 'link', 'recipient_type', 'ogrn', 'egryl_info', 'inn', 'kpp', 'full_name_grantee', 'short_name_grantee', 'director', 'director_position']
-
-
-
-class Get_list(ModelViewSet):
-  
-    queryset = Profile.objects.filter(id='541').all()
-    serializer_class = Main_app_serializers
- 
-        
+# Получить данные профиля грантов       
 class Get_profile(APIView):
     def get(self, request):
         user_id = request.user.id
-        prof = Profile.objects.filter(id=user_id)
-        serializer = Main_app_serializers(prof, many=True)
-        return Response(serializer.data)
+        #prof = Profile.objects.filter(id=user_id).values()
+        prof = Mun_obr_profile.objects.filter(author_id=user_id).values()
+        return Response(prof)
 
-    
+
+
+
+
+
+class Mun_obr_profile_api(APIView):
+    def post(self, request):
+        s = request.data
+        user_id = request.user.id
+        c = Mun_obr_profile.objects.filter(author_id=user_id)
+        serializer =Mun_obr_profileSerializer(data=s)
+        print()
+        if not c:
+            
+        
+            if serializer.is_valid(raise_exception=True):
+                resp = serializer.save()
+                return Response(serializer.data,status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            
+        else: 
+            if serializer.is_valid(raise_exception=True):
+                print(serializer.data)
+                Mun_obr_profile.objects.filter(author_id=user_id).update(**serializer.data)
+                return Response(serializer.data)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
         
 
 class Get_projects(APIView):

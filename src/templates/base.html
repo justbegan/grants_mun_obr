@@ -41,26 +41,6 @@
             <div class="ml-auto">
                 {% if user.is_authenticated %}
 
-
-                        
-                {% if "mun_obr" in request.get_full_path %}
-
-                <a class="btn btn-link text-dark mr-4" href="{% url 'mun_obr_profile' %}">
-                    <i class="fas fa-user mr-1"></i>
-                    Личный кабинет мун обр
-                    {% if notifications_unread %}
-                        <span class="badge badge-pill badge-primary"> {{ notifications_unread }} </span>
-                    {% endif %}
-                </a>
-                <a class="btn btn-link text-dark" href="{% url 'account_logout' %}">
-                    <i class="fas fa-door-open mr-1"></i>
-                    Выйти ({{ user.username }})
-                </a>
-
-
-            {% else %}
-
-
                     <a class="btn btn-link text-dark mr-4" href="{% url 'profile-home' %}">
                         <i class="fas fa-user mr-1"></i>
                         Личный кабинет
@@ -73,7 +53,7 @@
                         Выйти ({{ user.username }})
                     </a>
 
-                    {% endif %}
+             
                 {% else %}
                     <a class="btn btn-outline-dark" href="{% url 'account_login' %}">Войти</a>
                 {% endif %}
