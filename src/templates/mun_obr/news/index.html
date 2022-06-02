@@ -63,9 +63,13 @@
 
         <div id="vue_app">
 
+          {% endverbatim %}
+          {% include "mun_obr/news/modals.html"%}
+          {% verbatim %}
+
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col" v-for="value in news_json">
-                  <div class="card h-100">
+                  <div class="card h-100" v-on:dblclick="open_news($event,value.id)">
                   
                     <img :src="base_url + '/media/' + value.img" class="card-img-top" alt="...">
                     <div class="card-body">
