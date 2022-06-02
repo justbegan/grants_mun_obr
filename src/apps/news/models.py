@@ -14,7 +14,6 @@ class News(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Автор")
     img = models.ImageField(upload_to='news/%Y/%m/%d', verbose_name='Картинка', default=None, blank=True, null=True)
     thumb = models.TextField(default=None, null=True, max_length=400, verbose_name="Картинка")
-    for_munobr = models.BooleanField(default=False,verbose_name="Для мун. обр")
     class Meta:
         ordering = ['-created_on']
         verbose_name = 'Новость'

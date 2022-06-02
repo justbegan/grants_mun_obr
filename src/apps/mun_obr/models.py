@@ -1,6 +1,8 @@
+from itertools import chain
 from msilib.schema import Class
 from operator import mod
 from pyexpat import model
+from statistics import mode
 from turtle import title
 from django.db import models
 from django.contrib.auth.models import User
@@ -87,3 +89,10 @@ class Mun_obr_profile(models.Model):
     jur_adrs = models.CharField("Юридический адрес", max_length=255, blank=True)
     bank_data = models.CharField("Банковские реквизиты ", max_length=255, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, related_name='user_1')
+
+
+class Mun_obr_news(models.Model):
+
+    title = models.CharField("Заголовок",max_length=255)
+    img = models.ImageField(upload_to='mun_obr_news/%Y/%m/%d', verbose_name='Картинка', default=None, blank=True, null=True)
+    content = models.TextField(verbose_name="Текст новости", default=None, blank=True, null=True)

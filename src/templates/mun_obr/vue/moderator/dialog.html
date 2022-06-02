@@ -6,7 +6,7 @@
 
 <div v-for="(value, key, index) in chat_messeges">
 
-  <div v-if="value.author_id == profile_json.id">
+  <div v-if="value.author_id == profile_json.author_id">
 
     <p class="text-end">Вы</p>
     <textarea class="form-control ml-auto" aria-label="With textarea" style="width:300px" disabled>{{value.messege}}</textarea>

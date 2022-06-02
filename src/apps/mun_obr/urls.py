@@ -8,7 +8,8 @@ router = SimpleRouter()
 
 
 urlpatterns = [
-    path('', views.NewsList.as_view(), name='news_obr'),
+    path('news',views.news,name='news'),
+    path('api/get_news',views.Get_news.as_view()),
     path('vue_test/',views.vue_test, name="vue_test"),
     path('api/get_profile',views.Get_profile.as_view()),
     path('api/get_projects',views.Get_projects.as_view()),

@@ -1,4 +1,5 @@
 import imp
+from multiprocessing import context
 from urllib import request
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -10,16 +11,9 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 
-from .models import Statement
+from .models import Statement,Mun_obr_news
 from .serializers import *
 from rest_framework import status
-
-# Create your views here.
-class NewsList(generic.ListView):
-    queryset = News.objects.order_by('-created_on').filter(for_munobr=True)
-    template_name = 'news/index.html'
-
-
 
 from rest_framework.serializers import ModelSerializer
 from rest_framework.response import Response
@@ -27,7 +21,16 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 
+def news(request):
 
+    return render(request,'mun_obr/news/index.html')
+
+class Get_news(APIView):
+    def get(self,request):
+
+        resp = Mun_obr_news.objects.values()
+
+        return Response(resp)
 
 
 def notifies(request):
@@ -44,9 +47,10 @@ def notifies(request):
 
 
 def vue_test(request):
-
-
-    return render(request, 'mun_obr/vue/index.html')
+    context = {"moderator":False}
+    if "mun_obr_moder" in str(request.user.groups.all()):
+        context = {"moderator":True}
+    return render(request, 'mun_obr/vue/index.html',context=context)
 
 
 
@@ -72,7 +76,6 @@ class Get_profile(APIView):
                 "bank_data":"",
                 "author_id":request.user.id
             }]
-            print(context)
             return Response(context)
 
 

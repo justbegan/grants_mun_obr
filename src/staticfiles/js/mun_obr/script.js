@@ -148,7 +148,7 @@ new Vue({
         chat_messeges:"",
         create_messege_json:{
           messege:"",
-          author:541,
+          //author:541,
           statement_id: ""
         }
     },
@@ -161,7 +161,7 @@ new Vue({
 
         const vm = this
         
-        vm.profile_json.author = 541
+        vm.profile_json.author = vm.profile_json.author_id
         console.log(vm.profile_json)
         axios.post('/mun_obr/api/mun_obr_profile', vm.profile_json, {
           headers: vm.headers_json
@@ -231,12 +231,7 @@ new Vue({
             
       },
 
-      //Атвозаполнение из профиля
-      get_inn: function(){
-        document.getElementById("input8").value = this.profile_json.ogrn
-        document.getElementById("input10").value = this.profile_json.inn
- 
-      },
+
       // При открывании списка проектов
       projects(){
 
@@ -366,6 +361,16 @@ new Vue({
       //console.log(u)
         
       
+      },
+      //Атвозаполнение из профиля
+      get_data_from_profile:function(e){
+
+              
+        document.getElementById("id_ogrn").value = this.profile_json.ogrn
+        document.getElementById("id_inn").value = this.profile_json.inn
+ 
+
+
       },
 
       get_projects:function(e){
@@ -535,6 +540,8 @@ new Vue({
         for ( var key in this.create_messege_json ) {
           form_data.append(key, this.create_messege_json[key]);
         }
+
+        form_data.append("author_id",vm.profile_json.author_id)
         
         axios.post('/mun_obr/api/create_messege', form_data, {
           headers: vm.headers_form
@@ -585,7 +592,7 @@ new Vue({
             percent() {
               
              
-              var z = Object.keys(this.create_st).filter(v => this.create_st[v]).length * 7.692307692307692
+              var z = Object.keys(this.create_st).filter(v => this.create_st[v]).length * 5
 
               var val = Math.round(z)
               this.perc = val.toString() + "%"
