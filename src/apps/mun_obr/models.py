@@ -20,7 +20,7 @@ class Statement(models.Model):
     sum_expenses = models.BigIntegerField("Сумма расходов", blank=True,default=0)
     source = models.CharField("Источник (источники)", max_length=255,blank=True)
     #3 пункт
-    tab_1_file_1 = models.FileField("Файл 1", max_length=255,blank=True)
+    tab_1_file_1 = models.FileField("Файл 1",upload_to='mun_obr_files' ,blank=True)
     link = models.CharField("Сайт в сети Интернет", max_length=255,blank=True)
     recipient_type = models.CharField("Тип получателя софинансирования", max_length=255,blank=True)
     ogrn = models.CharField("ОГРН", max_length=255,blank=True)
@@ -37,7 +37,6 @@ class Statement(models.Model):
     d_mail = models.CharField("Почта руководителя", max_length=255,blank=True)
     d_amount_of_overdue_debt = models.CharField("Сумма просроченной задолженности", max_length=255,blank=True)
     author = models.ForeignKey(User, verbose_name="Автор", on_delete=models.CASCADE, blank=True)
-    file = models.FileField(upload_to='documents',max_length=100,blank=True)
     status = models.CharField('Статус заявки',choices=status_choises,default="На модерации",max_length=100)
     comment = models.CharField('Комментарий',max_length=250,blank=True)
 
@@ -96,3 +95,4 @@ class Mun_obr_news(models.Model):
     title = models.CharField("Заголовок",max_length=255)
     img = models.ImageField(upload_to='mun_obr_news/%Y/%m/%d', verbose_name='Картинка', default=None, blank=True, null=True)
     content = models.TextField(verbose_name="Текст новости", default=None, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now=True)

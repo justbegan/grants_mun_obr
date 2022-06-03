@@ -264,7 +264,7 @@ new Vue({
 
       for_test(){
         const vm = this
-        console.log(vm.profile_json)
+        console.log(vm.statement_json)
 
       },
 
@@ -362,6 +362,52 @@ new Vue({
         
       
       },
+
+      user_statemen_update:function(event){
+        const vm = this
+        var statement_id = vm.statement_json.id
+
+        vm.statement_json.status = "На модерации"
+       
+
+        delete vm.statement_json["file"]
+        delete vm.statement_json["tab_1_file_1"]
+        
+
+        // var form_data = new FormData();
+
+
+
+        // for ( var key in this.statement_json) {
+
+        //   form_data.append(key, this.statement_json[key]);
+
+        // }
+
+        axios.put('/mun_obr/api/statement_update/'+ statement_id, vm.statement_json, {
+          headers: vm.headers_json
+        })
+        .then(response => { 
+          
+
+          if(response.status >= 200 && response.status <= 226){
+
+         
+            vm.get_modal("authModal","Заявка обновлена")
+   
+          
+        } 
+
+
+        })
+        .catch(e => {
+          
+          this.errors = e.response.data
+          console.log(this.errors)
+        
+        })
+
+      },
       //Атвозаполнение из профиля
       get_data_from_profile:function(e){
 
@@ -441,8 +487,8 @@ new Vue({
         //get projecs with status = На модерации
         const vm = this
          
-        axios.get('/mun_obr/api/get_all_projects').then(function(response){
-
+        axios.get('/mun_obr/api/get_statements').then(function(response){
+          console.log(response.data)
           vm.moderator_projects = response.data
              
         });
@@ -450,46 +496,7 @@ new Vue({
 
       },
 
-      user_statemen_update:function(event){
-        const vm = this
-        var statement_id = vm.statement_json.id
-
-        vm.statement_json.status = "На модерации"
-
-        var form_data = new FormData();
-
-
-
-        for ( var key in this.statement_json) {
-
-          form_data.append(key, this.statement_json[key]);
-
-        }
-
-        axios.put('/mun_obr/api/statement_update/'+ statement_id, form_data, {
-          headers: vm.headers_form
-        })
-        .then(response => { 
-          
-
-          if(response.status >= 200 && response.status <= 226){
-
-         
-            vm.get_modal("authModal","Заявка обновлена")
    
-          
-        } 
-
-
-        })
-        .catch(e => {
-          
-          this.errors = e.response.data
-          console.log(this.errors)
-        
-        })
-
-      },
 
 
       get_messeges:function(event){

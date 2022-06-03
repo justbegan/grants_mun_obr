@@ -29,6 +29,10 @@ new Vue({
             myModal.show()
     
     
+          },
+
+        padTo2Digits:function(num) {
+            return String(num).padStart(2, '0');
           }
         
 
@@ -48,6 +52,33 @@ new Vue({
 
             
             vm.base_url =  window.location.origin
+
+    },
+    computed:{
+
+      create_time:function(){
+
+        const vm = this
+        var date = vm.selected_news.create_time
+       
+   
+        var d = new Date(date),
+  
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+        const hoursAndMinutes =
+        vm.padTo2Digits(d.getHours()) + ':' + vm.padTo2Digits(d.getMinutes());
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+      resp = [year, month, day].join('-');
+      return resp + " " + hoursAndMinutes
+
+      }
 
     }
 

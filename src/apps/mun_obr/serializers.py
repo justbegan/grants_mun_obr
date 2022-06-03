@@ -36,6 +36,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         instance.d_mail = validatet_data.get("d_mail", instance.d_mail)
         instance.d_amount_of_overdue_debt = validatet_data.get("d_amount_of_overdue_debt", instance.d_amount_of_overdue_debt)
         instance.comment = validatet_data.get("comment", instance.comment)
+        instance.file = validatet_data.get("file", instance.file)
+        instance.tab_1_file_1 = validatet_data.get("tab_1_file_1", instance.tab_1_file_1)
+        
         instance.save()
         return instance
 
@@ -54,7 +57,7 @@ class ContractSerializer(serializers.ModelSerializer):
 class Statement_for_getSerializer(serializers.ModelSerializer):
     class Meta:
         model = Statement
-        fields=['id','title']
+        fields=['id','title','status']
 
 
 

@@ -33,20 +33,8 @@ class Get_news(APIView):
         return Response(resp)
 
 
-def notifies(request):
-    notifications = request.user.notifications
-    context = {
-        'read': notifications.read(),
-        'unread': notifications.unread()
-    }
-    for notify in notifications.unread():
-        notify.mark_as_read()
 
-    return render(request, 'mun_obr/profile/notifies.html',context)
-
-
-
-def vue_test(request):
+def index(request):
     context = {"moderator":False}
     if "mun_obr_moder" in str(request.user.groups.all()):
         context = {"moderator":True}
@@ -110,28 +98,30 @@ class Mun_obr_profile_api(APIView):
 
 
         
-
+# Проекты пользователя по Id
 class Get_projects(APIView):
   
     def get(self, request):
         user_id = request.user.id
-        q = Statement.objects.filter(author_id=user_id).values()
-        return Response(q)
-        # return Response(self.get_verbose_name(user_id))
+        query = Statement.objects.filter(author_id=user_id).values()
+        return Response(query)
 
-    def get_verbose_name(self,user_id):
-        #Get verbose_name from model
-        f_name = Statement._meta.fields
-        verbose_names = [i.verbose_name for i in f_name]
 
-        v_list = [i for i in Statement.objects.filter(author_id=user_id).values_list()]
-
-        return [ dict(zip(verbose_names, i)) for i in v_list ]
-
+# Проекты для модера
 class Get_all_projects(APIView):
     def get(self,request):
 
         q = Statement.objects.filter(status="На модерации").values()
+        return Response(q)
+
+# Получть все проекты
+class Get_all_statements(APIView):
+  
+    def get(self, request):
+        # s = Statement.objects.all()
+        # s = Statement_for_getSerializer(s, many=True)
+        # return Response(s.data)
+        q = Statement.objects.values()
         return Response(q)
 
 
@@ -141,9 +131,6 @@ class Get_contracts(APIView):
         statement = Statement.objects.get(id=id)
         contract = statement.c_statementOf.values()
         return Response(contract[0])
-
-
-
 
 
 class Create_statement(APIView):
@@ -187,13 +174,6 @@ class Create_contract(APIView):
         
         return Response({"success": "Contract"})
 
-
-class Get_all_statements(APIView):
-  
-    def get(self, request):
-        s = Statement.objects.all()
-        s = Statement_for_getSerializer(s, many=True)
-        return Response(s.data)
 
 
 

@@ -62,7 +62,7 @@
     <div class="container-sm" style="margin-top: 5em;">
 
         <div id="vue_app">
-
+          <h3 style="margin-bottom:3%"><b>Новости для муниципальных образований</b></h3>
           {% endverbatim %}
           {% include "mun_obr/news/modals.html"%}
           {% verbatim %}
@@ -71,7 +71,7 @@
                 <div class="col" v-for="value in news_json">
                   <div class="card h-100" v-on:dblclick="open_news($event,value.id)">
                   
-                    <img :src="base_url + '/media/' + value.img" class="card-img-top" alt="...">
+                    <img :src="base_url + '/media/' + value.img" height="300px" class="card-img-top" alt="...">
                     <div class="card-body">
                       <h5 class="card-title">{{value.title}}</h5>
               
