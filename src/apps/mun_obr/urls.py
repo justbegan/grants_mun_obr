@@ -26,7 +26,7 @@ urlpatterns = [
     path('api/create_contract',views.Create_contract.as_view()),
     #Получить все заявки
     path('api/get_statements',views.Get_all_statements.as_view()),
-    #Заявки модера
+    #Заявки модера не используется
     path('api/get_all_projects',views.Get_all_projects.as_view()),
     #Обновление заявки
     path('api/statement_update/<int:pk>',views.Create_statement.as_view()),

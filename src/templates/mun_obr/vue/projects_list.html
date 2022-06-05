@@ -9,7 +9,7 @@
 
     <ul class="nav nav-tabs" id="myTab2" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" id="statement_open_tab" data-toggle="tab" href="#statement_open" role="tab" aria-controls="statement_open" aria-selected="true">Заявка</a>
+          <a class="nav-link active" id="statement_open_tab" data-toggle="tab" href="#statement_open" role="tab" aria-controls="statement_open" aria-selected="true">Заявка <p class="percent_font">Заполнено на {{u_perc}}</p></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" id="contract_tab" data-toggle="tab" href="#contract" role="tab" aria-controls="contract" aria-selected="false">Контракт</a>
@@ -65,7 +65,7 @@
         </tr>
       </thead>
       <tbody v-for="(value, key, index) in projects_json">
-        <tr v-on:click="open_project($event,value.id)" :value="value.id">
+        <tr v-on:dblclick="open_project($event,value.id)" :value="value.id">
           <th scope="row">{{key + 1}}</th>
           <td>{{value.title}}</td>
           <td>{{value.status}}</td>

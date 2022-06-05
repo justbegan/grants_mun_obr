@@ -1,5 +1,9 @@
 {% verbatim %}
-
+<h7>Процент заполнения</h7>
+<!--Процент заполнения-->
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" v-bind:style="{width:u_perc}" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">{{u_statement_percent}}%</div>
+  </div>
 
    
     <label for="exampleInputEmail1">Название</label>
@@ -21,7 +25,7 @@
       
       <a v-if="statement_json.tab_1_file_1 !=''" :href="'http://127.0.0.1:8000/media/'+ statement_json.tab_1_file_1">{{statement_json.tab_1_file_1}}</a>
 
-      <input type="file" class="form-control" id="tab_1_file_1" @change="uploadFile" ref="file">
+      <input type="file" class="form-control" id="tab_1_file_1" @change="uploadFile($event,'change_statement')" ref="file">
     
    
     <label for="exampleInputEmail1">Сайт в сети Интернет, используемый заявителем для размещения информации и документов об оказании на конкурсной основе поддержки социально 
@@ -74,9 +78,7 @@
   
     <label for="exampleInputEmail1">Сумма просроченной задолженности заявителя по возврату средств, полученных из федерального бюджета, руб.</label>
     <input type="text" class="form-control" placeholder="Введите данные" value="" id="input12" v-model="statement_json.d_amount_of_overdue_debt">
-  
-    <label for="exampleInputEmail1">Файл</label>
-    <input type="file" class="form-control" placeholder="Введите данные" value="" id="input13" @change="uploadFile" ref="file">
+
 
     <label for="exampleInputEmail1">Комментарий</label>
     <textarea class="form-control" aria-label="With textarea" v-model="statement_json.comment"></textarea>

@@ -10,7 +10,7 @@ from rest_framework import exceptions
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Statement
-        fields =  ['title','requested_sum', 'sum_expenses', 'source','tab_1_file_1', 'link', 'recipient_type', 'ogrn', 'egryl_info', 'inn', 'kpp', 'full_name_grantee', 'short_name_grantee', 'd_f_name','d_s_name','d_m_name','d_position','d_phone','d_mail','d_amount_of_overdue_debt','author','file','status','comment']
+        fields =  ['title','requested_sum', 'sum_expenses', 'source','tab_1_file_1', 'link', 'recipient_type', 'ogrn', 'egryl_info', 'inn', 'kpp', 'full_name_grantee', 'short_name_grantee', 'd_f_name','d_s_name','d_m_name','d_position','d_phone','d_mail','d_amount_of_overdue_debt','author','status','comment']
     def to_representation(self, instance):
         self.fields['user'] =  UserSerializer(read_only=True)
         return super(ArticleSerializer, self).to_representation(instance)
@@ -36,7 +36,6 @@ class ArticleSerializer(serializers.ModelSerializer):
         instance.d_mail = validatet_data.get("d_mail", instance.d_mail)
         instance.d_amount_of_overdue_debt = validatet_data.get("d_amount_of_overdue_debt", instance.d_amount_of_overdue_debt)
         instance.comment = validatet_data.get("comment", instance.comment)
-        instance.file = validatet_data.get("file", instance.file)
         instance.tab_1_file_1 = validatet_data.get("tab_1_file_1", instance.tab_1_file_1)
         
         instance.save()

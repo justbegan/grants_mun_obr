@@ -142,9 +142,9 @@ class Create_statement(APIView):
        
         if serializer.is_valid(raise_exception=True):
             resp = serializer.save()
-        
-        
-        return Response({"success": "Article"})
+            return Response({"success": serializer.data})
+        else:
+            return Response({"error":"error"})
 
     def put(self,request,*args,**kwargs):
         pk = kwargs.get("pk",None)

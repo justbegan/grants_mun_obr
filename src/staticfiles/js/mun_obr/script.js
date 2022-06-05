@@ -120,6 +120,7 @@ new Vue({
         // Проценты заполненности
         perc:"",
         perc_contract:"",
+        u_perc:"",
         // Кон
 
 
@@ -162,7 +163,6 @@ new Vue({
         const vm = this
         
         vm.profile_json.author = vm.profile_json.author_id
-        console.log(vm.profile_json)
         axios.post('/mun_obr/api/mun_obr_profile', vm.profile_json, {
           headers: vm.headers_json
         })
@@ -192,20 +192,19 @@ new Vue({
       //Обрабатывает загружаемые файлы
       uploadFile(e,name) {
 
-            console.log(name)
             //get id
             var z = e.srcElement.id
             //get file
             var file = e.target.files[0]
             var model 
 
-            if(z=='tab_1_file_1'){
+            if(name == 'change_statement'){
 
-              model = this.create_st
+              model = this.statement_json
 
             }
             else{
-              model = this.create_st_contract
+              model = this.create_st
             }
 
 
@@ -368,24 +367,24 @@ new Vue({
         var statement_id = vm.statement_json.id
 
         vm.statement_json.status = "На модерации"
-       
-
-        delete vm.statement_json["file"]
-        delete vm.statement_json["tab_1_file_1"]
         
 
-        // var form_data = new FormData();
+        delete vm.statement_json["file"]
+        //delete vm.statement_json["tab_1_file_1"]
+        
+
+        var form_data = new FormData();
 
 
 
-        // for ( var key in this.statement_json) {
+        for ( var key in this.statement_json) {
 
-        //   form_data.append(key, this.statement_json[key]);
+          form_data.append(key, this.statement_json[key]);
 
-        // }
+        }
 
-        axios.put('/mun_obr/api/statement_update/'+ statement_id, vm.statement_json, {
-          headers: vm.headers_json
+        axios.put('/mun_obr/api/statement_update/'+ statement_id, form_data, {
+          headers: vm.headers_form
         })
         .then(response => { 
           
@@ -403,7 +402,7 @@ new Vue({
         .catch(e => {
           
           this.errors = e.response.data
-          console.log(this.errors)
+     
         
         })
 
@@ -463,7 +462,7 @@ new Vue({
         .catch(e => {
           
           this.errors = e.response.data
-          console.log(this.errors)
+        
         
         })
 
@@ -488,7 +487,7 @@ new Vue({
         const vm = this
          
         axios.get('/mun_obr/api/get_statements').then(function(response){
-          console.log(response.data)
+          
           vm.moderator_projects = response.data
              
         });
@@ -513,7 +512,7 @@ new Vue({
           var statement_id = vm.statement_json.id
         }
         
-        console.log(statement_id)
+     
        
         axios.get('/mun_obr/api/get_messeges/'+ statement_id).then(function(response){
 
@@ -585,7 +584,40 @@ new Vue({
             myModal.show()
     
     
-          }
+          },
+
+      get_percent:function(name, num){
+
+        const vm = this
+
+        if(name == 'statement'){
+
+          var model = vm.create_st
+
+        }
+        else if(name == 'contract'){
+
+          var model = vm.create_st_contract
+        
+        }
+        else if(name == 'u_statement'){
+          
+          var model = Object.assign({},vm.statement_json)
+          delete model["author_id"]
+          delete model["comment"]
+          delete model["status"]
+          delete model["id"]
+         
+
+        
+        }
+
+
+        var z = Object.keys(model).filter(v => model[v]).length * num
+ 
+        return Math.round(z)
+
+      },
 
       
           },
@@ -597,29 +629,29 @@ new Vue({
 
       //Процент заполненности зявки 100/на кол-во полей
             percent() {
-              
-             
-              var z = Object.keys(this.create_st).filter(v => this.create_st[v]).length * 5
-
-              var val = Math.round(z)
-              this.perc = val.toString() + "%"
-              
-              return Math.round(z)
+              var persent = this.get_percent("statement", 5)
+              this.perc = persent.toString() + "%"
+              return persent
+            },
 
 
+            percent_contract() {
+
+
+              var c_persent = this.get_percent("contract", 7.692307692307692)
+              this.perc_contract = c_persent.toString() + "%"
+              return c_persent
 
             },
-            percent_contract() {
-              
+
+            u_statement_percent() {
+
+
+              var u_persent = this.get_percent("u_statement", 5)
              
-              var z = Object.keys(this.create_st_contract).filter(v => this.create_st_contract[v]).length * 7.692307692307692
-
-              var val = Math.round(z)
-              this.perc_contract = val.toString() + "%"
-              
-              return Math.round(z)
-
-
+              this.u_perc = u_persent.toString() + "%"
+              console.log(this.u_perc)
+              return u_persent
 
             },
          
